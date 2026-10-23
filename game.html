@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Uch Qahramon Poygasi</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Uch Poyga">
+<meta name="theme-color" content="#111111">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@600;800;900&display=swap">
 <style>
 /* Comic race: white dotted page, thick ink outlines, hard shadows. Lobby is one column; the race is a canvas with two steer buttons. */
@@ -43,6 +50,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
 .btn.big{width:100%;font:400 30px var(--display);letter-spacing:.04em;padding:14px;background:var(--p0);text-shadow:2px 2px 0 var(--ink);box-shadow:5px 5px 0 var(--ink)}
 .btn.big:disabled{background:#e4e4e4;color:#9a9a9a;text-shadow:none;box-shadow:none}
 .btn:not(:disabled):active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghostb{width:100%;padding:14px;font:400 26px var(--display);letter-spacing:.04em;background:#fff;color:var(--ink)}
 .notice{padding:12px 14px;font-weight:700;line-height:1.45}
 .lbl{font-family:var(--display);font-size:20px;letter-spacing:.06em;display:inline-block;background:var(--zap);border:2.5px solid var(--ink);padding:2px 10px;border-radius:6px;transform:rotate(-2deg);align-self:flex-start}
 
@@ -56,9 +64,14 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
 .mdl{font-weight:700;color:var(--muted);font-size:14px}
 /* race */
 .race{display:flex;flex-direction:column;gap:10px}
-#cv{display:block;width:100%;height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:340px;max-height:720px;border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);background:#7cc576;touch-action:none}
-.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pad{height:76px;font:400 40px var(--display);border:3px solid var(--ink);border-radius:16px;background:#fff;box-shadow:4px 4px 0 var(--ink);color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:none}
+body.racing{overflow:hidden;padding:0;background:#4a4d55}
+body.racing header{display:none}
+body.racing .wrap{padding:0;max-width:none}
+.race{position:fixed;inset:0;z-index:5}
+#cv{display:block;position:absolute;inset:0;width:100%;height:100%;background:#4a4d55;touch-action:none}
+.pads{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));pointer-events:none}
+.pad{pointer-events:auto;opacity:.88;height:84px;font:400 40px var(--display);border:3px solid var(--ink);border-radius:16px;background:#fff;box-shadow:4px 4px 0 var(--ink);color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:none}
+#safe{position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden}
 .pad.down{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);background:var(--zap)}
 
 /* results */
@@ -81,6 +94,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
     <div class="net" id="net"><span class="dot"></span><span>Ulanmoqda...</span></div>
   </header>
   <main id="app"></main>
+  <div id="safe"></div>
 </div>
 
 <script>
@@ -352,9 +366,9 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
     const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
     const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const R = race, ppm = H / 36, carY = H * .78;
+    const R = race, ppm = H / 32, carY = H - Math.max(170, H * .26), safeTop = (document.getElementById('safe')?.offsetHeight || 0);
     const shake = now < R.crashUntil ? (Math.random() - .5) * 8 : 0;
-    const side = W * .14, walk = W * .025, roadL = side + walk, roadW = W - 2 * roadL;
+    const side = W * .07, walk = W * .02, roadL = side + walk, roadW = W - 2 * roadL;
     const sx = x => roadL + x * roadW + shake, sy = d => carY - (d - R.d) * ppm;
     // grass + road
     c.fillStyle = '#d7d3c8'; c.fillRect(0, 0, W, H);
@@ -404,7 +418,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
       }
     }
     // other cars
-    const cw = roadW * .145;
+    const cw = roadW * .13;
     c.font = '900 13px Nunito, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'bottom';
     for (const i of players) {
       if (i === me) continue;
@@ -420,7 +434,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
     c.beginPath(); c.ellipse(sx(R.x), carY, cw * .85, cw * 1.35, 0, 0, Math.PI * 2); c.lineWidth = 3; c.strokeStyle = COLORS[me]; c.globalAlpha = .7; c.stroke(); c.globalAlpha = 1;
     car(c, sx(R.x), carY, cw, PAINT[carOf[me]], 1, carOf[me]);
     // progress strip
-    const px = 14, pw = W - 28, py = 14;
+    const px = 14, pw = W - 28, py = 14 + safeTop;
     rr(c, px, py, pw, 12, 6); c.fillStyle = '#fff'; c.fill(); c.lineWidth = 2.5; c.strokeStyle = '#111'; c.stroke();
     for (const i of players) {
       const d = i === me ? R.d : others[i] && others[i].g === R.gid ? others[i].d : 0;
@@ -446,8 +460,8 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
   }
 
   // ---------- screens ----------
-  let lastHtml = '', screen = '';
-  const setApp = (h, name) => { screen = name; if (h !== lastHtml) { $app.innerHTML = h; lastHtml = h; } };
+  let lastHtml = '', screen = '', dismissed = 0;
+  const setApp = (h, name) => { screen = name; document.body.classList.toggle('racing', name === 'race'); if (h !== lastHtml) { $app.innerHTML = h; lastHtml = h; } };
   const status = i => online[i] ? '<span class="pill on"><span class="dot on"></span>Onlayn</span>' : '<span class="pill"><span class="dot"></span>Oflayn</span>';
   const badge = i => `<div class="badge" style="--c:${COLORS[i]}">${ROSTER[i][0]}</div>`;
   const offlineNote = () => `<div class="card notice">Onlayn ulanib bo'lmadi. Internetni tekshirib, sahifani yangilang.</div>`;
@@ -456,7 +470,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
     if (me < 0) return renderPick();
     if (race && race.gid === gid && !race.fin) return renderRace();
     const live = gid && (Date.now() - gid < FRESH || players.some(i => results[i] && results[i].g === gid));
-    if (gid && live && (players.includes(me) ? results[me] && results[me].g === gid : true)) return renderResults();
+    if (gid && live && dismissed !== gid && (players.includes(me) ? results[me] && results[me].g === gid : true)) return renderResults();
     renderLobby();
   }
 
@@ -538,6 +552,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
           </div>`).join('')}
         </div>
         <button class="btn big" data-start ${allDone && n >= 2 && connected ? '' : 'disabled'}>Yangi poyga</button>
+        <button class="btn ghostb" data-back>Ortga</button>
         ${!allDone ? '<p class="sub">Hamma marraga yetib kelgach, yangi poyga boshlanadi.</p>' : n < 2 ? '<p class="sub">Yangi poyga uchun yana kamida bitta poygachi onlayn bo\'lishi kerak. Do\'stingiz sahifani qayta ochsin.</p>' : ''}
       </div>`, 'results');
   }
@@ -560,11 +575,21 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
   addEventListener('keydown', e => { if (e.key === 'ArrowLeft') keys.l = true; if (e.key === 'ArrowRight') keys.r = true; });
   addEventListener('keyup', e => { if (e.key === 'ArrowLeft') keys.l = false; if (e.key === 'ArrowRight') keys.r = false; });
 
+  function goFull() {
+    const el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
+    try {
+      const p = el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' }) : el.webkitRequestFullscreen && el.webkitRequestFullscreen();
+      if (p && p.then) p.then(() => { try { window.screen.orientation.lock('portrait').catch(() => {}); } catch (e) {} }).catch(() => {});
+    } catch (e) {}
+  }
+  document.addEventListener('pointerdown', goFull, { capture: true });
   $app.addEventListener('click', e => {
     const b = e.target.closest('button');
     if (!b || b.disabled) return;
     if (b.dataset.pick) { const i = +b.dataset.pick; if (online[i]) return; me = i; save(); connect(); render(); }
     else if ('start' in b.dataset) newRace();
+    else if ('back' in b.dataset) { dismissed = gid; render(); }
     else if (b.dataset.model) { carOf[me] = +b.dataset.model; save(); pub(`car/${me}`, b.dataset.model); render(); }
   });
 
