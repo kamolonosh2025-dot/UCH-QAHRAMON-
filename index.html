@@ -96,6 +96,46 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
 .rules{display:grid;gap:6px;font-size:13.5px;color:var(--muted);line-height:1.45}
 .rules b{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.hit,.float{animation:none}.bar i{transition:none}}
+
+/* ---- battle look ---- */
+body{background:radial-gradient(120% 60% at 50% -10%,#fff4f1 0%,var(--bg) 55%) fixed,var(--bg)}
+h1{font-size:30px;display:flex;align-items:center;gap:8px}
+h1 .sw{display:inline-flex;width:38px;height:38px;border-radius:11px;background:var(--ink);color:#fff;align-items:center;justify-content:center;font-size:20px}
+.badge{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:26px;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--c) 55%,#fff),var(--c));box-shadow:0 6px 14px -6px var(--c),inset 0 -3px 0 rgba(0,0,0,.15);border-radius:50%}
+.f .badge{width:62px;height:62px;font-size:32px}
+.ttl{font-weight:600;color:var(--muted);font-size:13px}
+.who{box-shadow:0 2px 0 var(--line)}
+.f{box-shadow:0 3px 0 var(--line);padding-top:14px}
+.f.me{box-shadow:0 3px 0 var(--c);background:color-mix(in srgb,var(--c) 5%,var(--bg))}
+.bar{height:10px;border:1.5px solid var(--line);background:#fff}
+.bar i{background:linear-gradient(90deg,#24b866,#7fd858)}
+.bar.low i{background:linear-gradient(90deg,#e5383b,#ff7b54)}
+.en span{width:16px;height:7px;border-radius:3px}
+.en span.on{background:linear-gradient(90deg,#f2b705,#ffd84d);box-shadow:0 0 6px #f2b70588}
+.pad{gap:10px}
+.act{position:relative;padding:14px 12px 12px;border-radius:16px;box-shadow:0 4px 0 var(--line);transition:transform .08s,box-shadow .08s}
+.act:not(:disabled):active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.act .ic{font-style:normal;font-size:24px;line-height:1;margin-bottom:4px;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.act.atk{background:color-mix(in srgb,var(--c) 7%,var(--bg));box-shadow:0 4px 0 color-mix(in srgb,var(--c) 40%,var(--line))}
+.act.def{background:color-mix(in srgb,var(--shield) 7%,var(--bg))}
+.act.def b{color:var(--shield)}
+.act.heal{background:color-mix(in srgb,var(--hp) 8%,var(--bg))}
+.act.heal b{color:var(--hp)}
+.act.sup{box-shadow:0 4px 0 #d9a300}
+.act.sup b{color:#a87800}
+.act.sup:not(:disabled){animation:glow 1.6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 4px 0 #d9a300,0 0 18px #f2b70577}}
+.btn.big{box-shadow:0 4px 0 #000;border-radius:16px;letter-spacing:.02em}
+.btn.big:disabled{box-shadow:none}
+.btn.big:not(:disabled):active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+.log li{background:#fff;border:1.5px solid var(--line);border-left:4px solid var(--ink)}
+.win{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 12%,#fff),#fff);border:2px solid var(--c)}
+.trophy{font-size:64px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.2) rotate(-20deg)}}
+.f.hit .badge{animation:flash .5s}
+@keyframes flash{30%{filter:brightness(1.8) saturate(.2);transform:scale(.9)}}
+.wait{background:#fff}
+@media (prefers-reduced-motion:reduce){.act.sup,.trophy,.f.hit .badge{animation:none}}
 </style>
 <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
 </head>
@@ -103,7 +143,7 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
 
 <div class="wrap">
   <header>
-    <h1>Uch <em>Qahramon</em></h1>
+    <h1><span class="sw">⚔</span>Uch <em>Qahramon</em></h1>
     <div class="net" id="net"><span class="dot"></span><span>Ulanmoqda...</span></div>
   </header>
   <main id="app"></main>
@@ -113,6 +153,7 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
 (() => {
   const ROSTER = ['Shahzod', 'Sardor', 'Ahmat'];
   const COLORS = ['var(--p0)', 'var(--p1)', 'var(--p2)'];
+  const HERO = ['🦁', '🐺', '🦅'], TITLE = ['Sher', 'Bo\'ri', 'Burgut'];
   const MAX_HP = 15, ATK = 3, SUP = 6, SUP_SHIELD = 3, HEAL = 2, TEAM = 1;
   const $app = document.getElementById('app'), $net = document.getElementById('net');
 
@@ -307,8 +348,8 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
         ${noRoom ? offlineNote() : hereNote()}
         <div class="roster">${ROSTER.map((n, i) => `
           <div class="who" style="--c:${COLORS[i]}">
-            <div class="badge">${n[0]}</div>
-            <div class="meta"><span class="nm">${n}</span><span class="st">${status(i)}</span></div>
+            <div class="badge">${HERO[i]}</div>
+            <div class="meta"><span class="nm">${n} <span class="ttl">· ${TITLE[i]}</span></span><span class="st">${status(i)}</span></div>
             <button class="btn" data-pick="${i}" ${online[i] ? 'disabled' : ''}>${online[i] ? 'Band' : 'Bu menman'}</button>
           </div>`).join('')}
         </div>
@@ -325,7 +366,7 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
         ${noRoom ? offlineNote() : hereNote()}
         <div class="roster">${ROSTER.map((n, i) => `
           <div class="who${i === me ? ' mine' : ''}" style="--c:${COLORS[i]}">
-            <div class="badge">${n[0]}</div>
+            <div class="badge">${HERO[i]}</div>
             <div class="meta"><span class="nm">${n}${i === me ? ' (siz)' : ''}</span><span class="st">${status(i)}</span></div>
           </div>`).join('')}
         </div>
@@ -347,8 +388,8 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
       return `
         <div class="f${i === me ? ' me' : ''}${alive ? '' : ' dead'}${last && last.def[i] ? ' shielded' : ''}${hurt ? ' hit' : ''}" style="--c:${COLORS[i]}">
           ${hurt ? `<span class="float minus">${last.delta[i]}</span>` : ''}${healed ? `<span class="float plus">+${last.delta[i]}</span>` : ''}
-          <div class="badge">${n[0]}</div>
-          <div class="nm">${n}${i === me && !local ? ' (siz)' : ''}</div>
+          <div class="badge">${HERO[i]}</div>
+          <div class="nm">${n}</div>
           <div class="st">${status(i)}</div>
           <div class="bar${pct <= 34 ? ' low' : ''}"><i style="width:${pct}%"></i></div>
           <div class="hpn">${st.hp[i]}<span style="color:var(--muted);font-size:11px">/${MAX_HP}</span></div>
@@ -363,7 +404,7 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
       const w = st.winner;
       pad = `<div class="win" style="--c:${w >= 0 ? COLORS[w] : 'var(--ink)'}">
           <div class="lbl">${st.round}-raundda tugadi</div>
-          <div class="crown">${w >= 0 ? `${ROSTER[w]} g'olib!` : 'Durang!'}</div>
+          <div class="trophy">${w >= 0 ? HERO[w] : '🤝'}</div><div class="crown">${w >= 0 ? `${ROSTER[w]} g'olib!` : 'Durang!'}</div>
           <p class="sub">${w === me ? 'Zo\'r jang qildingiz!' : w >= 0 ? 'Keyingi safar sizning navbatingiz.' : 'Hamma bir vaqtda yiqildi.'}</p>
           <button class="btn big" data-start ${local || online.every(Boolean) ? '' : 'disabled'}>Yangi jang</button>
           ${local || online.every(Boolean) ? '' : '<p class="sub" style="font-size:13px">Yangi jang uchun uchalangiz onlayn bo\'lishingiz kerak.</p>'}
@@ -380,10 +421,10 @@ h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-heigh
       const foes = [0, 1, 2].filter(i => i !== me && st.hp[i] > 0);
       const canSup = st.en[me] >= 3, canDef = !st.lastDef[me];
       pad = `<div class="pad">
-          ${foes.map(t => `<button class="act atk" style="--c:${COLORS[t]}" data-act="a${t}"><b>${ROSTER[t]}ga zarba</b><small>−${ATK}</small></button>`).join('')}
-          <button class="act" data-act="d" ${canDef ? '' : 'disabled'}><b>Qalqon</b><small>${canDef ? '🛡' : 'Ketma-ket emas'}</small></button>
-          <button class="act" data-act="h"><b>Davolanish</b><small>+${HEAL}</small></button>
-          ${foes.map(t => `<button class="act sup" data-act="s${t}" ${canSup ? '' : 'disabled'}><b>Kuchli zarba: ${ROSTER[t]}</b><small>${canSup ? `−${SUP}` : `${st.en[me]}/3`}</small></button>`).join('')}
+          ${foes.map(t => `<button class="act atk" style="--c:${COLORS[t]}" data-act="a${t}"><i class="ic">⚔️</i><b>${ROSTER[t]}ga zarba</b><small>−${ATK} jon</small></button>`).join('')}
+          <button class="act def" data-act="d" ${canDef ? '' : 'disabled'}><i class="ic">🛡️</i><b>Qalqon</b><small>${canDef ? 'Zarbani qaytaradi' : 'Ketma-ket emas'}</small></button>
+          <button class="act heal" data-act="h"><i class="ic">❤️</i><b>Davolanish</b><small>+${HEAL} jon</small></button>
+          ${foes.map(t => `<button class="act sup" data-act="s${t}" ${canSup ? '' : 'disabled'}><i class="ic">⚡</i><b>Kuchli zarba: ${ROSTER[t]}</b><small>${canSup ? `−${SUP}` : `${st.en[me]}/3`}</small></button>`).join('')}
         </div>`;
     }
 
