@@ -242,37 +242,77 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
 
   // ---------- drawing ----------
   function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
-  // Top-down sedans, front pointing up. Lacetti: compact and round; Cobalt: boxy with a trunk; Malibu: long and sleek.
+  // Top-down sedans, front pointing up, shaded like painted metal. Lacetti: compact and round; Cobalt: boxy with a flat trunk; Malibu: long and sleek.
+  const SHAPES = [
+    { h: 1.95, nose: .16, tail: .12, wind: .17, roof: .3, rear: .12 },
+    { h: 2.05, nose: .1, tail: .06, wind: .16, roof: .28, rear: .11 },
+    { h: 2.25, nose: .2, tail: .1, wind: .2, roof: .3, rear: .14 }];
+  function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16), ch = k => Math.max(0, Math.min(255, Math.round(((n >> k) & 255) * f + (f > 1 ? (f - 1) * 90 : 0))));
+    return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+  }
   function car(c, cx, cy, w, color, alpha, model) {
-    const shape = [{ h: 1.75, r: .34, wind: .2, rear: .14, roof: .3 }, { h: 1.9, r: .2, wind: .19, rear: .12, roof: .3 }, { h: 2.1, r: .36, wind: .22, rear: .16, roof: .34 }][model || 0];
-    const h = w * shape.h;
+    const S = SHAPES[model || 0], h = w * S.h, top = -h / 2, bot = h / 2;
     c.save(); c.globalAlpha = alpha; c.translate(cx, cy);
-    c.fillStyle = '#111';
-    for (const [sx, sy] of [[-1, -.3], [1, -.3], [-1, .3], [1, .3]]) { rr(c, sx * w * .5 - w * .12, sy * h - h * .09, w * .24, h * .18, 3); c.fill(); }
+    // shadow on the asphalt
+    c.save(); c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = w * .35; c.shadowOffsetY = w * .12;
+    c.fillStyle = 'rgba(0,0,0,.35)'; rr(c, -w * .48, top + 4, w * .96, h - 8, w * .3); c.fill(); c.restore();
+    // tyres peeking out
+    c.fillStyle = '#1b1b1b';
+    for (const [sx, sy] of [[-1, -.29], [1, -.29], [-1, .3], [1, .3]]) { rr(c, sx * w * .5 - w * .07, sy * h - h * .075, w * .14, h * .15, 3); c.fill(); }
+    // body outline with tapered nose and tail
+    const body = () => {
+      c.beginPath();
+      c.moveTo(-w * .5, top + h * S.nose);
+      c.bezierCurveTo(-w * .5, top + h * .02, -w * .3, top, 0, top);
+      c.bezierCurveTo(w * .3, top, w * .5, top + h * .02, w * .5, top + h * S.nose);
+      c.lineTo(w * .5, bot - h * S.tail);
+      c.bezierCurveTo(w * .5, bot - h * .01, w * .3, bot, 0, bot);
+      c.bezierCurveTo(-w * .3, bot, -w * .5, bot - h * .01, -w * .5, bot - h * S.tail);
+      c.closePath();
+    };
+    const g = c.createLinearGradient(-w / 2, 0, w / 2, 0);
+    g.addColorStop(0, shade(color, .45)); g.addColorStop(.18, shade(color, .9)); g.addColorStop(.42, shade(color, 1.25));
+    g.addColorStop(.58, shade(color, 1.25)); g.addColorStop(.82, shade(color, .9)); g.addColorStop(1, shade(color, .45));
+    body(); c.fillStyle = g; c.fill(); c.lineWidth = 1.2; c.strokeStyle = 'rgba(0,0,0,.6)'; c.stroke();
     // mirrors
-    c.fillStyle = color; c.strokeStyle = '#111'; c.lineWidth = 2;
-    for (const sx of [-1, 1]) { rr(c, sx * w * .5 - (sx < 0 ? w * .14 : 0), -h * .14, w * .14, h * .06, 2); c.fill(); c.stroke(); }
-    // body
-    rr(c, -w / 2, -h / 2, w, h, w * shape.r); c.fillStyle = color; c.fill(); c.lineWidth = 3; c.stroke();
-    // windshield, roof, rear window
-    const wy = -h * .5 + h * .24, ry = wy + h * shape.wind;
-    c.beginPath(); c.moveTo(-w * .36, wy + h * shape.wind); c.lineTo(-w * .3, wy); c.lineTo(w * .3, wy); c.lineTo(w * .36, wy + h * shape.wind); c.closePath();
-    c.fillStyle = '#bfe3ff'; c.fill(); c.lineWidth = 2; c.stroke();
-    rr(c, -w * .36, ry, w * .72, h * shape.roof, 4); c.fillStyle = color; c.fill(); c.stroke();
-    c.fillStyle = 'rgba(255,255,255,.25)'; rr(c, -w * .3, ry + 3, w * .6, h * shape.roof - 6, 3); c.fill();
-    const rw = ry + h * shape.roof;
-    c.beginPath(); c.moveTo(-w * .36, rw); c.lineTo(w * .36, rw); c.lineTo(w * .3, rw + h * shape.rear); c.lineTo(-w * .3, rw + h * shape.rear); c.closePath();
-    c.fillStyle = '#9fcbea'; c.fill(); c.stroke();
+    c.fillStyle = shade(color, .7);
+    const wy = top + h * (.27 + (model === 2 ? .03 : 0)), ry = wy + h * S.wind, rw = ry + h * S.roof;
+    for (const sx of [-1, 1]) { c.beginPath(); c.ellipse(sx * w * .55, wy + h * .02, w * .07, h * .025, 0, 0, Math.PI * 2); c.fill(); }
+    // hood panel lines
+    c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(-w * .22, top + h * .05); c.quadraticCurveTo(-w * .26, wy - h * .1, -w * .34, wy - 2);
+    c.moveTo(w * .22, top + h * .05); c.quadraticCurveTo(w * .26, wy - h * .1, w * .34, wy - 2); c.stroke();
+    // windshield
+    const glass = (y0, y1, wTop, wBot) => {
+      const gg = c.createLinearGradient(0, y0, 0, y1); gg.addColorStop(0, '#1d2a36'); gg.addColorStop(1, '#3d5468');
+      c.beginPath(); c.moveTo(-w * wTop, y0); c.lineTo(w * wTop, y0); c.lineTo(w * wBot, y1); c.lineTo(-w * wBot, y1); c.closePath();
+      c.fillStyle = gg; c.fill();
+    };
+    glass(wy, ry, .34, .39);
+    c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 2; c.beginPath(); c.moveTo(-w * .22, wy + 3); c.lineTo(-w * .05, ry - 3); c.stroke();
+    // side windows
+    c.fillStyle = '#26323d';
+    for (const sx of [-1, 1]) { c.beginPath(); c.moveTo(sx * w * .41, ry - h * .02); c.lineTo(sx * w * .45, ry + h * .04); c.lineTo(sx * w * .45, rw - h * .02); c.lineTo(sx * w * .41, rw + h * .02); c.closePath(); c.fill(); }
+    // roof
+    const rg = c.createLinearGradient(-w * .38, 0, w * .38, 0);
+    rg.addColorStop(0, shade(color, .8)); rg.addColorStop(.5, shade(color, 1.35)); rg.addColorStop(1, shade(color, .8));
+    rr(c, -w * .38, ry, w * .76, rw - ry, w * .12); c.fillStyle = rg; c.fill();
+    // rear window
+    glass(rw, rw + h * S.rear, .38, .33);
+    // trunk line
+    c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(-w * .36, rw + h * S.rear + h * .03); c.lineTo(w * .36, rw + h * S.rear + h * .03); c.stroke();
     // lights
-    c.fillStyle = '#fff6b0';
-    for (const sx of [-1, 1]) { rr(c, sx * w * .3 - w * .1, -h * .49, w * .2, h * .045, 2); c.fill(); }
-    c.fillStyle = '#ff2a2a';
-    for (const sx of [-1, 1]) { rr(c, sx * w * .3 - w * .1, h * .45, w * .2, h * .04, 2); c.fill(); }
-    // model details
-    c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = 1.5;
-    if (model === 1) { c.beginPath(); c.moveTo(-w * .32, h * .36); c.lineTo(w * .32, h * .36); c.stroke(); }
-    if (model === 2) { c.fillStyle = '#e8e8e8'; rr(c, -w * .22, -h * .47, w * .44, h * .03, 2); c.fill(); c.beginPath(); c.moveTo(-w * .15, -h * .42); c.lineTo(-w * .2, wy - 2); c.moveTo(w * .15, -h * .42); c.lineTo(w * .2, wy - 2); c.stroke(); }
-    if (model === 0) { c.beginPath(); c.arc(0, -h * .38, w * .08, 0, Math.PI * 2); c.stroke(); }
+    c.save(); c.shadowColor = '#fff7c2'; c.shadowBlur = 6; c.fillStyle = '#fffbe0';
+    for (const sx of [-1, 1]) { c.beginPath(); c.ellipse(sx * w * .33, top + h * .035, w * .1, h * .016, sx * -.25, 0, Math.PI * 2); c.fill(); }
+    c.shadowColor = '#ff2020'; c.fillStyle = '#e01515';
+    for (const sx of [-1, 1]) { c.beginPath(); c.ellipse(sx * w * .34, bot - h * .03, w * .1, h * .014, sx * .2, 0, Math.PI * 2); c.fill(); }
+    c.restore();
+    // model details: Malibu chrome grille, Cobalt flat trunk lip, Lacetti badge
+    if (model === 2) { c.fillStyle = '#e9edf2'; rr(c, -w * .24, top + h * .012, w * .48, h * .014, 2); c.fill(); }
+    if (model === 1) { c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(-w * .3, bot - h * .055, w * .6, 1.5); }
+    if (model === 0) { c.fillStyle = '#e9edf2'; c.beginPath(); c.ellipse(0, top + h * .05, w * .05, h * .012, 0, 0, Math.PI * 2); c.fill(); }
     c.restore();
   }
   function hash(n) { let t = (n * 2654435761) >>> 0; t ^= t >>> 15; t = Math.imul(t, 2246822519) >>> 0; t ^= t >>> 13; return t / 4294967296; }
@@ -361,7 +401,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
       }
     }
     // other cars
-    const cw = roadW * .12;
+    const cw = roadW * .145;
     c.font = '900 13px Nunito, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'bottom';
     for (const i of players) {
       if (i === me) continue;
@@ -492,6 +532,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
           </div>`).join('')}
         </div>
         <button class="btn big" data-start ${allDone && n >= 2 && connected ? '' : 'disabled'}>Yangi poyga</button>
+        ${!allDone ? '<p class="sub">Hamma marraga yetib kelgach, yangi poyga boshlanadi.</p>' : n < 2 ? '<p class="sub">Yangi poyga uchun yana kamida bitta poygachi onlayn bo\'lishi kerak. Do\'stingiz sahifani qayta ochsin.</p>' : ''}
       </div>`, 'results');
   }
 
