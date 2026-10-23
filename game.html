@@ -2,191 +2,74 @@
 <html lang="uz">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Uch Qahramon</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Uch Qahramon Poygasi</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@600;800;900&display=swap">
 <style>
-*{box-sizing:border-box}
-body{margin:0}
-/* Layout: white arena, one column on the phone. Three fighter cards on top, the action pad below, the round report under it. */
+/* Comic race: white dotted page, thick ink outlines, hard shadows. Lobby is one column; the race is a canvas with two steer buttons. */
 :root{
-  --bg:#ffffff; --ink:#15161a; --muted:#6b6f7a; --line:#e6e7ec; --soft:#f4f5f8;
-  --p0:#e5383b; --p1:#2d6cdf; --p2:#ef8a00;
-  --hp:#1fa65a; --hurt:#e5383b; --shield:#2d6cdf; --zap:#f2b705;
+  --bg:#fff; --ink:#111; --muted:#5d6068; --soft:#f3f3f3; --zap:#ffd400; --hp:#18b45b;
+  --p0:#ff3b3b; --p1:#2f6bff; --p2:#ff9f00;
   --display:"Bangers","Impact","Arial Black",system-ui,sans-serif;
   --body:"Nunito",system-ui,-apple-system,sans-serif;
   color-scheme:light;
 }
-html,body{min-height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;-webkit-tap-highlight-color:transparent}
-.wrap{max-width:520px;margin:0 auto;padding-block:18px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
-button{font-family:var(--body);cursor:pointer;touch-action:manipulation}
-button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
-button:disabled{cursor:default}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-h1{font-family:var(--display);font-weight:400;font-size:28px;line-height:1;margin:0;letter-spacing:.01em}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:#fff;background-image:radial-gradient(#e9e9e9 1.2px,transparent 1.3px);background-size:14px 14px;color:var(--ink);font-family:var(--body);font-size:15px;-webkit-tap-highlight-color:transparent;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:520px;margin:0 auto;padding-block:14px 24px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-family:var(--display);font-weight:400;font-size:34px;line-height:1;margin:0;letter-spacing:.03em;transform:rotate(-2deg);text-shadow:3px 3px 0 var(--zap);display:flex;align-items:center;gap:8px}
 h1 em{font-style:normal;color:var(--p0)}
-.net{font:700 12px var(--body);color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
-.dot{width:9px;height:9px;border-radius:50%;background:#c4c6cf;flex:none}
-.dot.on{background:var(--hp);box-shadow:0 0 0 3px color-mix(in srgb,var(--hp) 20%,transparent)}
-h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0;line-height:1.15;text-wrap:balance}
-.sub{color:var(--muted);margin:0;line-height:1.5}
-.notice{background:var(--soft);border-radius:12px;padding:12px 14px;color:var(--muted);line-height:1.5;font-size:14px}
-.notice b{color:var(--ink)}
-
-/* pick + lobby */
-.roster{display:grid;gap:10px}
-.who{display:flex;align-items:center;gap:12px;padding:12px;border:2px solid var(--line);border-radius:16px;background:var(--bg)}
-.who.mine{border-color:var(--c)}
-.badge{width:46px;height:46px;border-radius:12px;background:var(--c);color:#fff;font:400 22px var(--display);display:flex;align-items:center;justify-content:center;flex:none}
-.who .meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.who .nm{font-weight:800;font-size:17px}
-.who .st{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
-.pill{display:inline-flex;align-items:center;gap:6px;font:800 12px var(--body);padding:4px 10px;border-radius:99px;background:var(--soft);color:var(--muted)}
-.pill.on{background:color-mix(in srgb,var(--hp) 14%,var(--bg));color:var(--hp)}
-.f .pill{font-size:10.5px;padding:3px 7px;gap:4px}
-.here{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:2px solid var(--line);line-height:1.45;font-size:14px}
-.here b{font-weight:800}
-#share{font:600 14px var(--body);padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--soft);color:var(--ink);width:100%;box-sizing:border-box;min-width:0}
-.btn{font-weight:800;font-size:15px;padding:11px 16px;border-radius:12px;border:0;background:var(--ink);color:#fff}
-.btn.ghost{background:var(--soft);color:var(--ink)}
-.btn:disabled{background:var(--soft);color:#a9acb6}
-.btn.big{font:400 20px var(--display);padding:16px;border-radius:14px;width:100%}
-
-/* arena */
-.fighters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.f{border:2px solid var(--line);border-radius:16px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;position:relative;background:var(--bg)}
-.f.me{border-color:var(--c)}
-.f.dead{opacity:.45}
-.f .badge{width:52px;height:52px;font-size:24px;position:relative}
-.f .nm{font-weight:800;font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.f .st{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;justify-content:center}
-.bar{width:100%;height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--hp);border-radius:99px;transition:width .5s ease}
-.bar.low i{background:var(--hurt)}
-.hpn{font:400 15px var(--display);font-variant-numeric:tabular-nums}
-.en{display:flex;gap:3px}
-.en span{width:14px;height:6px;border-radius:2px;background:var(--soft)}
-.en span.on{background:var(--zap)}
-.chose{font-size:11px;font-weight:700;color:var(--muted);min-height:1.3em}
-.chose.ok{color:var(--hp)}
-.float{position:absolute;top:4px;left:50%;transform:translateX(-50%);font:400 20px var(--display);pointer-events:none;animation:up 1.4s ease forwards}
-.float.minus{color:var(--hurt)} .float.plus{color:var(--hp)}
-@keyframes up{0%{opacity:0;transform:translate(-50%,10px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
-.hit{animation:shake .45s}
-@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
-.shielded .badge::after{content:"";position:absolute;inset:-6px;border-radius:16px;border:3px solid var(--shield)}
-
-.pad{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.act{border:2px solid var(--line);background:var(--bg);border-radius:14px;padding:12px 10px;text-align:left;display:flex;flex-direction:column;gap:3px;color:var(--ink)}
-.act b{font-size:15px;font-weight:800}
-.act small{font-size:12px;color:var(--muted);line-height:1.35}
-.act.atk{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
-.act.atk b{color:var(--c)}
-.act.sup{background:color-mix(in srgb,var(--zap) 12%,var(--bg));border-color:var(--zap)}
-.act:disabled{opacity:.38}
-.act:not(:disabled):active{transform:scale(.97)}
-.wait{border:2px dashed var(--line);border-radius:14px;padding:16px;text-align:center;color:var(--muted);line-height:1.5}
-.wait b{color:var(--ink)}
-.log{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
-.log li{background:var(--soft);border-radius:10px;padding:9px 12px;line-height:1.4;font-size:14px}
-.lbl{font:800 11px var(--body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.win{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;padding:18px;border-radius:18px;background:var(--soft)}
-.win .crown{font:400 34px var(--display);color:var(--c)}
-.rules{display:grid;gap:6px;font-size:13.5px;color:var(--muted);line-height:1.45}
-.rules b{color:var(--ink)}
-@media (prefers-reduced-motion:reduce){.hit,.float{animation:none}.bar i{transition:none}}
-
-/* ---- battle look ---- */
-body{background:radial-gradient(120% 60% at 50% -10%,#fff4f1 0%,var(--bg) 55%) fixed,var(--bg)}
-h1{font-size:30px;display:flex;align-items:center;gap:8px}
-h1 .sw{display:inline-flex;width:38px;height:38px;border-radius:11px;background:var(--ink);color:#fff;align-items:center;justify-content:center;font-size:20px}
-.badge{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:26px;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--c) 55%,#fff),var(--c));box-shadow:0 6px 14px -6px var(--c),inset 0 -3px 0 rgba(0,0,0,.15);border-radius:50%}
-.f .badge{width:62px;height:62px;font-size:32px}
-.ttl{font-weight:600;color:var(--muted);font-size:13px}
-.who{box-shadow:0 2px 0 var(--line)}
-.f{box-shadow:0 3px 0 var(--line);padding-top:14px}
-.f.me{box-shadow:0 3px 0 var(--c);background:color-mix(in srgb,var(--c) 5%,var(--bg))}
-.bar{height:10px;border:1.5px solid var(--line);background:#fff}
-.bar i{background:linear-gradient(90deg,#24b866,#7fd858)}
-.bar.low i{background:linear-gradient(90deg,#e5383b,#ff7b54)}
-.en span{width:16px;height:7px;border-radius:3px}
-.en span.on{background:linear-gradient(90deg,#f2b705,#ffd84d);box-shadow:0 0 6px #f2b70588}
-.pad{gap:10px}
-.act{position:relative;padding:14px 12px 12px;border-radius:16px;box-shadow:0 4px 0 var(--line);transition:transform .08s,box-shadow .08s}
-.act:not(:disabled):active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
-.act .ic{font-style:normal;font-size:24px;line-height:1;margin-bottom:4px;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
-.act.atk{background:color-mix(in srgb,var(--c) 7%,var(--bg));box-shadow:0 4px 0 color-mix(in srgb,var(--c) 40%,var(--line))}
-.act.def{background:color-mix(in srgb,var(--shield) 7%,var(--bg))}
-.act.def b{color:var(--shield)}
-.act.heal{background:color-mix(in srgb,var(--hp) 8%,var(--bg))}
-.act.heal b{color:var(--hp)}
-.act.sup{box-shadow:0 4px 0 #d9a300}
-.act.sup b{color:#a87800}
-.act.sup:not(:disabled){animation:glow 1.6s ease-in-out infinite}
-@keyframes glow{50%{box-shadow:0 4px 0 #d9a300,0 0 18px #f2b70577}}
-.btn.big{box-shadow:0 4px 0 #000;border-radius:16px;letter-spacing:.02em}
-.btn.big:disabled{box-shadow:none}
-.btn.big:not(:disabled):active{transform:translateY(3px);box-shadow:0 1px 0 #000}
-.log li{background:#fff;border:1.5px solid var(--line);border-left:4px solid var(--ink)}
-.win{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 12%,#fff),#fff);border:2px solid var(--c)}
-.trophy{font-size:64px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
-@keyframes pop{from{transform:scale(.2) rotate(-20deg)}}
-.f.hit .badge{animation:flash .5s}
-@keyframes flash{30%{filter:brightness(1.8) saturate(.2);transform:scale(.9)}}
-.wait{background:#fff}
-@media (prefers-reduced-motion:reduce){.act.sup,.trophy,.f.hit .badge{animation:none}}
-
-/* ---- comic arena: thick ink outlines, hard shadows, halftone dots ---- */
-:root{--ink:#111;--line:#111;--soft:#f3f3f3;--p0:#ff3b3b;--p1:#2f6bff;--p2:#ff9f00;--hp:#18b45b;--zap:#ffd400}
-body{background:#fff;background-image:radial-gradient(#e9e9e9 1.2px,transparent 1.3px);background-size:14px 14px}
-h1{font-size:40px;letter-spacing:.03em;font-weight:400;transform:rotate(-2deg);text-shadow:3px 3px 0 var(--zap)}
-h1 em{color:var(--p0)}
-h1 .sw{background:var(--p0);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);transform:rotate(-8deg)}
-h2{font-size:30px;letter-spacing:.03em;font-weight:400}
-.net{border:2.5px solid var(--ink);border-radius:99px;padding:4px 10px;background:#fff;box-shadow:2px 2px 0 var(--ink);color:var(--ink)}
-.who,.f,.act,.wait,.notice,.here,.log li,.win{border:3px solid var(--ink)!important;box-shadow:4px 4px 0 var(--ink)!important;border-radius:14px}
+h1 .sw{display:inline-flex;width:38px;height:38px;border-radius:11px;background:var(--p0);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);align-items:center;justify-content:center;font-size:20px;transform:rotate(-8deg);text-shadow:none}
+h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0;letter-spacing:.03em;line-height:1.1}
+.net{font:800 12px var(--body);display:flex;align-items:center;gap:6px;white-space:nowrap;border:2.5px solid var(--ink);border-radius:99px;padding:4px 10px;background:#fff;box-shadow:2px 2px 0 var(--ink)}
+.dot{width:9px;height:9px;border-radius:50%;background:#bbb;flex:none}
+.dot.on{background:var(--hp)}
+.sub{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+button{font-family:var(--body);cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
+.card{border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);border-radius:14px;background:#fff}
+.roster{display:grid;gap:12px}
+.who{display:flex;align-items:center;gap:12px;padding:12px}
 .who.mine{background:color-mix(in srgb,var(--c) 14%,#fff)}
-.f{background:#fff}
-.f.me{background:color-mix(in srgb,var(--c) 16%,#fff);transform:rotate(-1deg)}
-.badge{border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
-.nm{font-weight:900}
-.hpn{font-size:20px;letter-spacing:.03em}
-.bar{height:12px;border:2.5px solid var(--ink);border-radius:4px}
-.bar i{border-radius:0}
-.en span{border:1.5px solid var(--ink);height:8px}
-.pill{border:2px solid var(--ink);background:#fff;color:var(--ink)}
-.pill.on{background:#c9f7d9;color:var(--ink)}
-.act{border-radius:14px}
-.act b{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.03em}
-.act small{font-weight:800;color:var(--ink);opacity:.7}
-.act.atk{background:color-mix(in srgb,var(--c) 18%,#fff)}
-.act.def{background:#dfe8ff}
-.act.heal{background:#d8f7e3}
-.act.sup{background:var(--zap)}
-.act.sup b{color:var(--ink)}
-.act:not(:disabled):active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)!important}
-.act:disabled{filter:grayscale(1)}
-@keyframes glow{50%{transform:rotate(-1.5deg) scale(1.02)}}
-.btn{border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-weight:900}
-.btn.ghost{background:#fff}
-.btn.big{font-size:28px;font-weight:400;background:var(--p0);color:#fff;box-shadow:5px 5px 0 var(--ink);text-shadow:2px 2px 0 var(--ink);letter-spacing:.04em}
-.btn.big:disabled{background:#e4e4e4;color:#9a9a9a;text-shadow:none;box-shadow:none;border-color:#bbb}
-.btn.big:not(:disabled):active{transform:translate(4px,4px);box-shadow:1px 1px 0 var(--ink)}
-.lbl{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.06em;color:var(--ink);display:inline-block;background:var(--zap);border:2.5px solid var(--ink);padding:2px 10px;border-radius:6px;transform:rotate(-2deg);align-self:flex-start}
-.log li{border-left-width:3px!important;font-weight:700}
-.crown{font-size:46px!important;letter-spacing:.03em;text-shadow:3px 3px 0 var(--ink)}
-.win{background:#fff}
-#share{border:2.5px solid var(--ink)}
-.float{font-size:30px;-webkit-text-stroke:1.5px var(--ink)}
+.badge{width:48px;height:48px;border-radius:50%;background:var(--c);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);display:flex;align-items:center;justify-content:center;flex:none;font:400 24px var(--display);color:#fff;text-shadow:2px 2px 0 var(--ink)}
+.meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.nm{font-weight:900;font-size:17px}
+.pill{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font:800 12px var(--body);padding:3px 9px;border-radius:99px;border:2px solid var(--ink);background:#fff}
+.pill.on{background:#c9f7d9}
+.btn{font-weight:900;font-size:15px;padding:10px 16px;border-radius:12px;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:var(--ink);color:#fff}
+.btn:disabled{background:#e4e4e4;color:#9a9a9a;box-shadow:none;border-color:#bbb}
+.btn.big{width:100%;font:400 30px var(--display);letter-spacing:.04em;padding:14px;background:var(--p0);text-shadow:2px 2px 0 var(--ink);box-shadow:5px 5px 0 var(--ink)}
+.btn.big:disabled{background:#e4e4e4;color:#9a9a9a;text-shadow:none;box-shadow:none}
+.btn:not(:disabled):active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.notice{padding:12px 14px;font-weight:700;line-height:1.45}
+.lbl{font-family:var(--display);font-size:20px;letter-spacing:.06em;display:inline-block;background:var(--zap);border:2.5px solid var(--ink);padding:2px 10px;border-radius:6px;transform:rotate(-2deg);align-self:flex-start}
+
+/* race */
+.race{display:flex;flex-direction:column;gap:10px}
+#cv{display:block;width:100%;height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:340px;max-height:720px;border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);background:#7cc576;touch-action:none}
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pad{height:76px;font:400 40px var(--display);border:3px solid var(--ink);border-radius:16px;background:#fff;box-shadow:4px 4px 0 var(--ink);color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:none}
+.pad.down{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);background:var(--zap)}
+
+/* results */
+.res{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px}
+.place{font:400 34px var(--display);width:34px;text-align:center}
+.row .t{font:400 26px var(--display);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.win{text-align:center;padding:16px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.trophy{font-size:60px;line-height:1;animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+.crown{font:400 42px var(--display);letter-spacing:.03em;color:var(--c);text-shadow:3px 3px 0 var(--ink)}
+@keyframes pop{from{transform:scale(.2) rotate(-20deg)}}
+@media (prefers-reduced-motion:reduce){.trophy{animation:none}}
 </style>
 <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
 </head>
 <body>
-
 <div class="wrap">
   <header>
-    <h1><span class="sw">⚔</span>Uch <em>Qahramon</em></h1>
+    <h1><span class="sw">🏁</span>Uch <em>Poyga</em></h1>
     <div class="net" id="net"><span class="dot"></span><span>Ulanmoqda...</span></div>
   </header>
   <main id="app"></main>
@@ -195,41 +78,30 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
 <script>
 (() => {
   const ROSTER = ['Shahzod', 'Sardor', 'Ahmat'];
-  const COLORS = ['var(--p0)', 'var(--p1)', 'var(--p2)'];
-  const HERO = ['🦁', '🐺', '🦅'], TITLE = ['Sher', 'Bo\'ri', 'Burgut'];
-  const MAX_HP = 15, ATK = 3, SUP = 6, SUP_SHIELD = 3, HEAL = 2, TEAM = 1;
+  const COLORS = ['#ff3b3b', '#2f6bff', '#ff9f00'];
+  const TRACK = 2000, VMAX = 55, ACC = 16, FRESH = 150000;   // metres, m/s, m/s², ms a race stays "live"
   const $app = document.getElementById('app'), $net = document.getElementById('net');
 
-  // ---------- connection: a public MQTT broker, one private "xona" (room) per link ----------
+  // ---------- connection: a public MQTT broker, one fixed room ----------
   const BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt'];
   const params = new URLSearchParams(location.search);
-  let code = (params.get('xona') || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12);
-  if (!code) code = 'asosiy';  // one fixed room, so the plain link always works
-  const T = 'uchqahramon/v1/' + code, KEY = 'uq:' + code;
-  const shareUrl = location.origin + location.pathname + (code === 'asosiy' ? '' : '?xona=' + code);
+  const code = (params.get('xona') || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12) || 'asosiy';
+  const T = 'uchqahramon/poyga1/' + code, KEY = 'uqp:' + code;
 
-  let client = null, connected = false, brokerIdx = 0, everConnected = false;
-  let me = -1, gid = 0, myMoves = [];
-  let theirs = [null, null, null];     // {g, m} last seen moves per player
+  let client = null, connected = false, brokerIdx = 0, everConnected = false, noRoom = false, synced = false;
+  let me = -1, gid = 0, players = [0, 1, 2];
   let online = [false, false, false];
-  let clash = false;
-  let lastRound = 0, noRoom = false;
-  let players = [0, 1, 2];  // who is in the current battle
-  const onlineCount = () => online.filter(Boolean).length;
-  let local = false, localMoves = [[], [], []], handoff = true;  // one phone passed around
+  let results = [null, null, null];   // {g, t} finish time in seconds
+  let others = [null, null, null];    // {g, d, x} live position
+  let race = null;
 
-  try {
-    const s = JSON.parse(localStorage.getItem(KEY) || '{}');
-    if (Number.isInteger(s.me)) me = s.me;
-    if (s.gid) { gid = s.gid; myMoves = Array.isArray(s.m) ? s.m : []; }
-  } catch (e) {}
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ me, gid, m: myMoves })); } catch (e) {} };
-  const pub = (t, v) => { if (client && connected) client.publish(`${T}/${t}`, v, { retain: true, qos: 1 }); };
-  const pushMoves = () => { if (me >= 0) pub(`m/${me}`, JSON.stringify({ g: gid, m: myMoves })); };
+  try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); if (Number.isInteger(s.me)) me = s.me; } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ me })); } catch (e) {} };
+  const pub = (t, v, retain = true) => { if (client && connected) client.publish(`${T}/${t}`, v, { retain, qos: retain ? 1 : 0 }); };
+  const onlineCount = () => online.filter(Boolean).length;
 
   function setNet() {
-    $net.innerHTML = local ? '<span class="dot on"></span><span>Bitta telefon</span>'
-      : connected ? '<span class="dot on"></span><span>Onlayn</span>'
+    $net.innerHTML = connected ? '<span class="dot on"></span><span>Onlayn</span>'
       : everConnected ? '<span class="dot"></span><span>Qayta ulanmoqda...</span>'
       : noRoom ? '<span class="dot"></span><span>Oflayn</span>' : '<span class="dot"></span><span>Ulanmoqda...</span>';
   }
@@ -244,26 +116,22 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
     else if (kind === 'g') {
       const [gs, ps] = msg.split('|');
       const g = +gs || 0;
-      const pl = ps ? [...new Set([...ps].map(Number))].filter(k => k >= 0 && k < 3) : [0, 1, 2];
-      players = pl.length >= 2 ? pl : [0, 1, 2];
-      if (g !== gid) { gid = g; myMoves = []; theirs = [null, null, null]; lastRound = 0; save(); pushMoves(); }
-    } else if (kind === 'm' && i >= 0 && i < 3) {
-      try {
-        const d = JSON.parse(msg);
-        if (typeof d.g !== 'number' || !Array.isArray(d.m)) return;
-        const m = d.m.filter(x => typeof x === 'string').slice(0, 200);
-        if (i === me) { if (d.g === gid && m.length > myMoves.length) { myMoves = m; save(); } }
-        else theirs[i] = { g: d.g, m };
-      } catch (e) { return; }
+      const pl = ps ? [...new Set([...ps].map(Number))].filter(k => k >= 0 && k < 3) : [];
+      if (g !== gid) { gid = g; players = pl.length >= 2 ? pl : [0, 1, 2]; others = [null, null, null]; decide(); }
+    } else if (kind === 'f' && i >= 0 && i < 3) {
+      try { const d = JSON.parse(msg); if (typeof d.g === 'number' && typeof d.t === 'number') results[i] = d; } catch (e) {}
+    } else if (kind === 'pos' && i >= 0 && i < 3 && i !== me) {
+      try { const d = JSON.parse(msg); if (typeof d.g === 'number' && typeof d.d === 'number') others[i] = { g: d.g, d: d.d, x: +d.x || .5 }; } catch (e) {}
+      if (race && !race.fin) return;   // the race loop draws positions itself
     }
     later();
   }
 
   function connect() {
-    if (local || typeof mqtt === 'undefined') { noRoom = true; setNet(); render(); return; }
+    if (typeof mqtt === 'undefined') { noRoom = true; setNet(); render(); return; }
     if (client) { const old = client; client = null; try { old.end(true); } catch (e) {} }
     connected = false; setNet();
-    const opts = { clientId: 'uq_' + Math.random().toString(36).slice(2, 10), keepalive: 15, reconnectPeriod: 2000, connectTimeout: 8000, clean: true };
+    const opts = { clientId: 'uqp_' + Math.random().toString(36).slice(2, 10), keepalive: 15, reconnectPeriod: 2000, connectTimeout: 8000, clean: true };
     if (me >= 0) opts.will = { topic: `${T}/on/${me}`, payload: '0', retain: true, qos: 1 };
     const c = client = mqtt.connect(BROKERS[brokerIdx], opts);
     let ok = false;
@@ -271,7 +139,8 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
       if (c !== client) return;
       ok = true; connected = true; everConnected = true; noRoom = false; setNet();
       c.subscribe(`${T}/#`, { qos: 1 });
-      if (me >= 0) { pub(`on/${me}`, '1'); pushMoves(); }
+      if (me >= 0) pub(`on/${me}`, '1');
+      if (!synced) setTimeout(() => { synced = true; decide(); }, 800);
       render();
     });
     c.on('close', () => { if (c === client && connected) { connected = false; setNet(); render(); } });
@@ -282,104 +151,202 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
     }, 9000);
   }
 
-  // ---------- game rules: one pure function of everyone's moves ----------
-  function movesOf(i) {
-    if (local) return localMoves[i];
-    if (i === me) return myMoves;
-    const k = theirs[i];
-    return k && k.g === gid ? k.m : [];
+  // ---------- race ----------
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   }
-  function simulate() {
-    const inGame = local ? [0, 1, 2] : players;
-    const hp = [0, 1, 2].map(i => inGame.includes(i) ? MAX_HP : 0), en = [0, 0, 0], lastDef = [false, false, false];
-    const all = [0, 1, 2].map(movesOf);
-    const rounds = [];
-    let r = 0, over = false, winner = -1;
-    while (!over) {
-      const alive = [0, 1, 2].filter(i => hp[i] > 0);
-      if (!alive.every(i => typeof all[i][r] === 'string')) break;
-      const act = [null, null, null], tgt = [-1, -1, -1];
-      for (const i of alive) {
-        let a = all[i][r][0], t = +all[i][r].slice(1);
-        if ((a === 'a' || a === 's') && !(t >= 0 && t < 3 && t !== i && hp[t] > 0)) a = 'x';
-        if (a === 's' && en[i] < 3) a = 'a';
-        if (a === 'd' && lastDef[i]) a = 'x';
-        if (!'asdh'.includes(a)) a = 'x';
-        act[i] = a; tgt[i] = t;
+  function buildTrack(seed) {
+    const r = rng(seed % 2147483647), obs = [], lanes = [.2, .5, .8];
+    let y = 70;
+    while (y < TRACK - 50) {
+      y += 18 + r() * 16;
+      const free = Math.floor(r() * 3);
+      for (let k = 0; k < 3; k++) {
+        if (k === free || r() < .4) continue;
+        const roll = r();
+        obs.push({ d: y, x: lanes[k], k: roll < .18 ? 'boost' : roll < .6 ? 'cone' : 'box', hit: false });
       }
-      const dmg = [0, 0, 0], heal = [0, 0, 0], log = [], hits = [0, 0, 0];
-      for (const i of alive) {
-        const a = act[i], t = tgt[i];
-        if (a === 'a' || a === 's') hits[t]++;
-      }
-      for (const i of alive) {
-        const a = act[i], t = tgt[i], A = ROSTER[i], T = ROSTER[t];
-        if (a === 'a') {
-          if (act[t] === 'd') { dmg[i] += 1; log.push(`${A} ${T}ga zarba berdi, lekin qalqonga urildi va o'zi 1 jon yo'qotdi.`); }
-          else { const d = ATK + (hits[t] > 1 ? TEAM : 0); dmg[t] += d; log.push(`${A} ${T}ga zarba berdi: −${d}.`); }
-        } else if (a === 's') {
-          const d = (act[t] === 'd' ? SUP_SHIELD : SUP) + (hits[t] > 1 ? TEAM : 0);
-          dmg[t] += d;
-          log.push(act[t] === 'd' ? `${A} kuchli zarba bilan ${T}ning qalqonini yorib o'tdi: −${d}.` : `${A} ${T}ga kuchli zarba berdi: −${d}!`);
-        } else if (a === 'd') log.push(`${A} qalqon ko'tardi.`);
-        else if (a === 'h') { heal[i] += HEAL; log.push(`${A} yarasini bog'ladi: +${HEAL}.`); }
-        else log.push(`${A} hech narsa qilmadi.`);
-      }
-      const ganged = [0, 1, 2].filter(t => hits[t] > 1 && act[t] !== 'd');
-      for (const t of ganged) log.push(`Ikkalasi birga ${ROSTER[t]}ga yopishdi! Har bir zarbaga +${TEAM}.`);
-      const before = hp.slice();
-      for (const i of alive) {
-        hp[i] = Math.max(0, Math.min(MAX_HP, hp[i] + heal[i]) - dmg[i]);
-        en[i] = act[i] === 's' ? 0 : Math.min(3, en[i] + 1);
-        lastDef[i] = act[i] === 'd';
-        if (hp[i] === 0) log.push(`${ROSTER[i]} yiqildi!`);
-      }
-      rounds.push({ log, delta: [0, 1, 2].map(i => hp[i] - before[i]), def: [0, 1, 2].map(i => act[i] === 'd') });
-      r++;
-      const left = [0, 1, 2].filter(i => hp[i] > 0);
-      if (left.length <= 1) { over = true; winner = left.length ? left[0] : -1; }
     }
-    return { hp, en, lastDef, round: r, rounds, over, winner };
+    return obs;
   }
 
-  // ---------- actions ----------
-  function pick(i) { if (online[i]) return; me = i; save(); connect(); render(); }
-  function leave() { pub(`on/${me}`, '0'); me = -1; save(); connect(); render(); }
-  function startBattle() {
-    if (local) { localMoves = [[], [], []]; handoff = true; lastRound = 0; return render(); }
-    gid = Date.now(); myMoves = []; theirs = [null, null, null]; lastRound = 0;
-    players = [0, 1, 2].filter(i => online[i]);
-    if (players.length < 2) return;
-    pub('g', gid + '|' + players.join('')); pushMoves(); save(); render();
-  }
-  function choose(code) {
-    const st = simulate();
-    if (local) {
-      if (localMoves[me].length !== st.round) return;
-      localMoves[me] = localMoves[me].concat(code); handoff = true; return render();
-    }
-    if (myMoves.length !== st.round || !connected) return;
-    myMoves = myMoves.concat(code); pushMoves(); save(); render();
+  function decide() {
+    if (!synced || me < 0) return render();
+    if (race && race.gid === gid) return render();
+    const done = results[me] && results[me].g === gid;
+    if (gid && !done && players.includes(me) && Date.now() - gid < FRESH) startRace();
+    render();
   }
 
-  // ---------- render ----------
-  let lastHtml = '';
-  const setApp = h => { if (h !== lastHtml) { $app.innerHTML = h; lastHtml = h; } };
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const status = i => local ? '' : online[i]
-    ? `<span class="pill on"><span class="dot on"></span>Onlayn</span>`
-    : `<span class="pill"><span class="dot"></span>Oflayn</span>`;
+  function newRace() {
+    const pl = [0, 1, 2].filter(i => online[i]);
+    if (pl.length < 2 || me < 0) return;
+    gid = Date.now(); players = pl; others = [null, null, null];
+    pub('g', gid + '|' + pl.join(''));
+    startRace(); render();
+  }
+
+  function startRace() {
+    race = { gid, obs: buildTrack(gid), d: 0, x: .5, v: 0, steer: 0, boostUntil: 0, crashUntil: 0,
+             start: performance.now() + Math.max(0, gid + 3500 - Date.now()), fin: false, time: 0, lastPub: 0, last: performance.now() };
+    keys.l = keys.r = false;
+    try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
+    requestAnimationFrame(tick);
+  }
+
+  const keys = { l: false, r: false };
+  function tick(now) {
+    if (!race || race.fin || race.gid !== gid) return;
+    const R = race, dt = Math.min(.05, (now - R.last) / 1000); R.last = now;
+    const t = now - R.start;
+    if (t >= 0) {
+      R.steer = (keys.r ? 1 : 0) - (keys.l ? 1 : 0);
+      R.x = Math.max(.1, Math.min(.9, R.x + R.steer * dt * 1.5));
+      const boosted = now < R.boostUntil, crashed = now < R.crashUntil;
+      const top = crashed ? 14 : boosted ? VMAX * 1.45 : VMAX;
+      R.v = R.v < top ? Math.min(top, R.v + (boosted ? ACC * 2.5 : ACC) * dt) : Math.max(top, R.v - 40 * dt);
+      const prev = R.d; R.d += R.v * dt;
+      for (const o of R.obs) {
+        if (o.hit || o.d < prev - 1.5 || o.d > R.d + 1.5) continue;
+        if (Math.abs(o.x - R.x) < .17) {
+          o.hit = true;
+          if (o.k === 'boost') { R.boostUntil = now + 1600; buzz(30); }
+          else { R.v *= .25; R.crashUntil = now + 800; buzz(160); }
+        }
+      }
+      if (R.d >= TRACK) {
+        R.d = TRACK; R.fin = true; R.time = Math.round(t / 100) / 10;
+        results[me] = { g: R.gid, t: R.time };
+        pub(`f/${me}`, JSON.stringify(results[me]));
+        pub(`pos/${me}`, JSON.stringify({ g: R.gid, d: TRACK, x: R.x }), false);
+        draw(now); setTimeout(render, 900); return;
+      }
+    }
+    if (now - R.lastPub > 160) { R.lastPub = now; pub(`pos/${me}`, JSON.stringify({ g: R.gid, d: Math.round(R.d * 10) / 10, x: Math.round(R.x * 100) / 100 }), false); }
+    draw(now);
+    requestAnimationFrame(tick);
+  }
+  const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+
+  // ---------- drawing ----------
+  function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+  function car(c, cx, cy, w, color, alpha) {
+    const h = w * 1.7;
+    c.save(); c.globalAlpha = alpha; c.translate(cx, cy);
+    c.fillStyle = '#111';
+    for (const [sx, sy] of [[-1, -.32], [1, -.32], [-1, .3], [1, .3]]) { rr(c, sx * w * .5 - w * .13, sy * h - h * .11, w * .26, h * .22, 3); c.fill(); }
+    rr(c, -w / 2, -h / 2, w, h, w * .28); c.fillStyle = color; c.fill(); c.lineWidth = 3; c.strokeStyle = '#111'; c.stroke();
+    rr(c, -w * .32, -h * .22, w * .64, h * .22, 5); c.fillStyle = '#cfe9ff'; c.fill(); c.lineWidth = 2; c.stroke();
+    c.fillStyle = 'rgba(255,255,255,.85)'; rr(c, -w * .08, -h * .46, w * .16, h * .9, 3); c.fill();
+    c.restore();
+  }
+  function draw(now) {
+    const cv = document.getElementById('cv'); if (!cv || !race) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const R = race, ppm = H / 42, carY = H * .78;
+    const shake = now < R.crashUntil ? (Math.random() - .5) * 8 : 0;
+    const roadL = W * .1, roadW = W * .8;
+    const sx = x => roadL + x * roadW + shake, sy = d => carY - (d - R.d) * ppm;
+    // grass + road
+    c.fillStyle = '#7cc576'; c.fillRect(0, 0, W, H);
+    c.fillStyle = '#4a4d55'; c.fillRect(roadL, 0, roadW, H);
+    // kerbs
+    const stripe = 4;
+    for (let k = Math.floor((R.d - 12) / stripe); k < (R.d + 46) / stripe; k++) {
+      const y = sy((k + 1) * stripe);
+      c.fillStyle = k % 2 ? '#fff' : '#ff3b3b';
+      c.fillRect(roadL - 10, y, 10, stripe * ppm); c.fillRect(roadL + roadW, y, 10, stripe * ppm);
+    }
+    // lane dashes
+    c.fillStyle = 'rgba(255,255,255,.85)';
+    for (let k = Math.floor((R.d - 12) / 8); k < (R.d + 46) / 8; k++) {
+      const y = sy(k * 8 + 4);
+      for (const lx of [1 / 3, 2 / 3]) c.fillRect(roadL + lx * roadW - 3, y, 6, 4 * ppm);
+    }
+    // finish line
+    const fy = sy(TRACK);
+    if (fy > -40 && fy < H + 40) {
+      const sq = roadW / 10;
+      for (let k = 0; k < 10; k++) for (let j = 0; j < 2; j++) { c.fillStyle = (k + j) % 2 ? '#111' : '#fff'; c.fillRect(roadL + k * sq, fy - (j + 1) * sq / 2, sq, sq / 2); }
+    }
+    // obstacles
+    for (const o of R.obs) {
+      const y = sy(o.d); if (y < -40 || y > H + 40) continue;
+      const x = sx(o.x), s = roadW * .11;
+      if (o.k === 'boost') {
+        c.globalAlpha = o.hit ? .35 : 1;
+        rr(c, x - s, y - s * .7, s * 2, s * 1.4, 8); c.fillStyle = '#ffd400'; c.fill(); c.lineWidth = 3; c.strokeStyle = '#111'; c.stroke();
+        c.save(); c.translate(x, y); c.rotate(-Math.PI / 2);
+        c.fillStyle = '#111'; c.font = `400 ${s * 1.3}px Bangers, Impact, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('»', 0, 0);
+        c.restore(); c.globalAlpha = 1;
+      } else if (o.k === 'cone') {
+        c.save(); c.translate(x, y); if (o.hit) c.rotate(1.2);
+        c.beginPath(); c.moveTo(0, -s * .9); c.lineTo(s * .65, s * .6); c.lineTo(-s * .65, s * .6); c.closePath();
+        c.fillStyle = '#ff7a00'; c.fill(); c.lineWidth = 3; c.strokeStyle = '#111'; c.stroke();
+        c.fillStyle = '#fff'; c.fillRect(-s * .32, -s * .05, s * .64, s * .2);
+        c.restore();
+      } else {
+        c.save(); c.translate(x, y); if (o.hit) c.rotate(.5);
+        rr(c, -s * .8, -s * .8, s * 1.6, s * 1.6, 4); c.fillStyle = '#b5773a'; c.fill(); c.lineWidth = 3; c.strokeStyle = '#111'; c.stroke();
+        c.beginPath(); c.moveTo(-s * .8, -s * .8); c.lineTo(s * .8, s * .8); c.moveTo(s * .8, -s * .8); c.lineTo(-s * .8, s * .8); c.lineWidth = 2; c.stroke();
+        c.restore();
+      }
+    }
+    // other cars
+    const cw = roadW * .15;
+    c.font = '900 13px Nunito, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'bottom';
+    for (const i of players) {
+      if (i === me) continue;
+      const o = others[i]; if (!o || o.g !== R.gid) continue;
+      const y = sy(o.d); if (y < -60 || y > H + 60) continue;
+      car(c, sx(o.x), y, cw, COLORS[i], .55);
+      c.fillStyle = '#111'; c.fillText(ROSTER[i], sx(o.x), y - cw * .95);
+    }
+    // my car
+    if (now < R.boostUntil) { c.fillStyle = 'rgba(255,212,0,.6)'; c.beginPath(); c.moveTo(sx(R.x) - cw * .35, carY + cw * .85); c.lineTo(sx(R.x), carY + cw * (1.6 + Math.random() * .6)); c.lineTo(sx(R.x) + cw * .35, carY + cw * .85); c.fill(); }
+    car(c, sx(R.x), carY, cw, COLORS[me], 1);
+    // progress strip
+    const px = 14, pw = W - 28, py = 14;
+    rr(c, px, py, pw, 12, 6); c.fillStyle = '#fff'; c.fill(); c.lineWidth = 2.5; c.strokeStyle = '#111'; c.stroke();
+    for (const i of players) {
+      const d = i === me ? R.d : others[i] && others[i].g === R.gid ? others[i].d : 0;
+      const x = px + 6 + (pw - 12) * Math.min(1, d / TRACK);
+      c.beginPath(); c.arc(x, py + 6, i === me ? 9 : 7, 0, Math.PI * 2); c.fillStyle = COLORS[i]; c.fill(); c.lineWidth = 2.5; c.stroke();
+    }
+    // speed + distance
+    c.textAlign = 'left'; c.textBaseline = 'top'; c.font = '400 26px Bangers, Impact, sans-serif'; c.lineWidth = 4; c.strokeStyle = '#111'; c.fillStyle = '#fff';
+    const sp = `${Math.round(R.v * 3.6)} KM/SOAT`, left = `${Math.max(0, Math.round(TRACK - R.d))} M QOLDI`;
+    c.strokeText(sp, 14, py + 22); c.fillText(sp, 14, py + 22);
+    c.strokeText(left, 14, py + 50); c.fillText(left, 14, py + 50);
+    // countdown
+    const t = now - R.start;
+    if (t < 900) {
+      const txt = t < -2000 ? '3' : t < -1000 ? '2' : t < 0 ? '1' : 'KETDIK!';
+      c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `400 ${txt.length > 1 ? 64 : 110}px Bangers, Impact, sans-serif`;
+      c.lineWidth = 8; c.strokeStyle = '#111'; c.strokeText(txt, W / 2, H * .4); c.fillStyle = t < 0 ? '#ffd400' : '#18b45b'; c.fillText(txt, W / 2, H * .4);
+    }
+    if (R.fin) {
+      c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '400 72px Bangers, Impact, sans-serif';
+      c.lineWidth = 8; c.strokeStyle = '#111'; c.strokeText('MARRA!', W / 2, H * .4); c.fillStyle = '#ffd400'; c.fillText('MARRA!', W / 2, H * .4);
+    }
+  }
+
+  // ---------- screens ----------
+  let lastHtml = '', screen = '';
+  const setApp = (h, name) => { screen = name; if (h !== lastHtml) { $app.innerHTML = h; lastHtml = h; } };
+  const status = i => online[i] ? '<span class="pill on"><span class="dot on"></span>Onlayn</span>' : '<span class="pill"><span class="dot"></span>Oflayn</span>';
+  const badge = i => `<div class="badge" style="--c:${COLORS[i]}">${ROSTER[i][0]}</div>`;
+  const offlineNote = () => `<div class="card notice">Onlayn ulanib bo'lmadi. Internetni tekshirib, sahifani yangilang.</div>`;
 
   function render() {
-    if (local) {
-      const st = simulate();
-      const next = [0, 1, 2].find(i => st.hp[i] > 0 && localMoves[i].length <= st.round);
-      me = st.over || next === undefined ? -1 : next;
-      return renderArena();
-    }
     if (me < 0) return renderPick();
-    if (!gid) return renderLobby();
-    renderArena();
+    if (race && race.gid === gid && !race.fin) return renderRace();
+    const live = gid && (Date.now() - gid < FRESH || players.some(i => results[i] && results[i].g === gid));
+    if (gid && live && (players.includes(me) ? results[me] && results[me].g === gid : true)) return renderResults();
+    renderLobby();
   }
 
   function renderPick() {
@@ -388,138 +355,99 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
         <h2>Siz kimsiz?</h2>
         ${noRoom ? offlineNote() : ''}
         <div class="roster">${ROSTER.map((n, i) => `
-          <div class="who" style="--c:${COLORS[i]}">
-            <div class="badge">${HERO[i]}</div>
-            <div class="meta"><span class="nm">${n} <span class="ttl">· ${TITLE[i]}</span></span><span class="st">${status(i)}</span></div>
+          <div class="card who">
+            ${badge(i)}
+            <div class="meta"><span class="nm">${n}</span>${status(i)}</div>
             <button class="btn" data-pick="${i}" ${online[i] ? 'disabled' : ''}>${online[i] ? 'Band' : 'Bu menman'}</button>
           </div>`).join('')}
         </div>
-      </div>`);
+      </div>`, 'pick');
   }
 
   function renderLobby() {
-    const n = onlineCount(), all = n >= 2;
+    const n = onlineCount(), ok = n >= 2 && connected;
     setApp(`
       <div style="display:flex;flex-direction:column;gap:14px">
         <h2>Salom, <span style="color:${COLORS[me]}">${ROSTER[me]}</span>!</h2>
-        <p class="sub">${all ? `${n} kishi onlayn. Jangni boshlash mumkin!` : 'Kamida yana bitta qahramon onlayn bo\'lishini kuting.'}</p>
-        ${clash ? `<div class="notice"><b>Diqqat:</b> ${ROSTER[me]} ismi boshqa telefonda ham tanlangan. Bittangiz boshqa ism tanlang.</div>` : ''}
+        <p class="sub">${ok ? `${n} kishi onlayn. Poygani boshlash mumkin!` : 'Kamida yana bitta poygachi onlayn bo\'lishini kuting.'}</p>
         ${noRoom ? offlineNote() : ''}
-        <div class="roster">${ROSTER.map((n, i) => `
-          <div class="who${i === me ? ' mine' : ''}" style="--c:${COLORS[i]}">
-            <div class="badge">${HERO[i]}</div>
-            <div class="meta"><span class="nm">${n}${i === me ? ' (siz)' : ''}</span><span class="st">${status(i)}</span></div>
+        <div class="roster">${ROSTER.map((nm, i) => `
+          <div class="card who${i === me ? ' mine' : ''}" style="--c:${COLORS[i]}">
+            ${badge(i)}
+            <div class="meta"><span class="nm">${nm}${i === me ? ' (siz)' : ''}</span>${status(i)}</div>
           </div>`).join('')}
         </div>
-        <button class="btn big" data-start ${all ? '' : 'disabled'}>Jangni boshlash</button>
-        <button class="btn ghost" data-leave>Boshqa ism tanlash</button>
-      </div>`);
+        <button class="btn big" data-start ${ok ? '' : 'disabled'}>Poygani boshlash</button>
+      </div>`, 'lobby');
   }
 
-  function renderArena() {
-    const st = simulate();
-    const mine = me >= 0 ? movesOf(me).length : 0;
-    const newRound = st.round > lastRound;
-    const last = st.rounds[st.round - 1];
-    const shown = local ? [0, 1, 2] : players;
-    const fighters = shown.map(i => {
-      const n = ROSTER[i];
-      const pct = st.hp[i] / MAX_HP * 100;
-      const chosen = movesOf(i).length > st.round;
-      const alive = st.hp[i] > 0;
-      const hurt = newRound && last && last.delta[i] < 0, healed = newRound && last && last.delta[i] > 0;
-      return `
-        <div class="f${i === me ? ' me' : ''}${alive ? '' : ' dead'}${last && last.def[i] ? ' shielded' : ''}${hurt ? ' hit' : ''}" style="--c:${COLORS[i]}">
-          ${hurt ? `<span class="float minus">${last.delta[i]}</span>` : ''}${healed ? `<span class="float plus">+${last.delta[i]}</span>` : ''}
-          <div class="badge">${HERO[i]}</div>
-          <div class="nm">${n}</div>
-          <div class="st">${status(i)}</div>
-          <div class="bar${pct <= 34 ? ' low' : ''}"><i style="width:${pct}%"></i></div>
-          <div class="hpn">${st.hp[i]}<span style="color:var(--muted);font-size:11px">/${MAX_HP}</span></div>
-          <div class="en" aria-label="Kuch: ${st.en[i]}/3">${[0, 1, 2].map(k => `<span class="${k < st.en[i] ? 'on' : ''}"></span>`).join('')}</div>
-          <div class="chose${chosen ? ' ok' : ''}">${st.over || !alive ? (alive ? '' : 'Yiqildi') : chosen ? 'Tanladi ✓' : 'O\'ylayapti...'}</div>
-        </div>`;
-    }).join('');
-    if (newRound) lastRound = st.round;
+  function renderRace() {
+    if (screen === 'race' && document.getElementById('cv')) return;
+    setApp(`
+      <div class="race">
+        <canvas id="cv"></canvas>
+        <div class="pads">
+          <button class="pad" data-steer="l" aria-label="Chapga">◀</button>
+          <button class="pad" data-steer="r" aria-label="O'ngga">▶</button>
+        </div>
+      </div>`, 'race');
+    wireRace();
+  }
 
-    let pad = '';
-    if (st.over) {
-      const w = st.winner;
-      pad = `<div class="win" style="--c:${w >= 0 ? COLORS[w] : 'var(--ink)'}">
-          <div class="lbl">${st.round}-raundda tugadi</div>
-          <div class="trophy">${w >= 0 ? HERO[w] : '🤝'}</div><div class="crown">${w >= 0 ? `${ROSTER[w]} g'olib!` : 'Durang!'}</div>
-          <p class="sub">${w === me ? 'Zo\'r jang qildingiz!' : w >= 0 ? 'Keyingi safar sizning navbatingiz.' : 'Hamma bir vaqtda yiqildi.'}</p>
-          <button class="btn big" data-start ${local || onlineCount() >= 2 ? '' : 'disabled'}>Yangi jang</button>
-          ${local || onlineCount() >= 2 ? '' : '<p class="sub" style="font-size:13px">Yangi jang uchun kamida 2 kishi onlayn bo\'lishi kerak.</p>'}
-        </div>`;
-    } else if (local && handoff) {
-      pad = `<div class="wait" style="--c:${COLORS[me]}">Telefonni <b style="color:var(--c)">${ROSTER[me]}</b>ga bering.<br><br>
-        <button class="btn big" style="background:var(--c)" data-ready>Men ${ROSTER[me]}, tayyorman</button></div>`;
-    } else if (!local && !players.includes(me)) {
-      pad = `<div class="wait"><b>Bu jangda siz yo'qsiz.</b><br>Jang tugashini kuting, keyingisida qatnashasiz.</div>`;
-    } else if (st.hp[me] <= 0) {
-      pad = `<div class="wait"><b>Siz yiqildingiz.</b><br>Qolgan ikkisining jangini tomosha qiling.</div>`;
-    } else if (mine > st.round) {
-      const waiting = [0, 1, 2].filter(i => st.hp[i] > 0 && movesOf(i).length <= st.round).map(i => ROSTER[i]);
-      pad = `<div class="wait">Tanlovingiz: <b>${describe(movesOf(me)[st.round])}</b><br>Kutilmoqda: ${waiting.map(esc).join(', ')}</div>`;
-    } else {
-      const foes = [0, 1, 2].filter(i => i !== me && st.hp[i] > 0);
-      const canSup = st.en[me] >= 3, canDef = !st.lastDef[me];
-      pad = `<div class="pad">
-          ${foes.map(t => `<button class="act atk" style="--c:${COLORS[t]}" data-act="a${t}"><i class="ic">⚔️</i><b>${ROSTER[t]}ga zarba</b><small>−${ATK} jon</small></button>`).join('')}
-          <button class="act def" data-act="d" ${canDef ? '' : 'disabled'}><i class="ic">🛡️</i><b>Qalqon</b><small>${canDef ? 'Zarbani qaytaradi' : 'Ketma-ket emas'}</small></button>
-          <button class="act heal" data-act="h"><i class="ic">❤️</i><b>Davolanish</b><small>+${HEAL} jon</small></button>
-          ${foes.map(t => `<button class="act sup" data-act="s${t}" ${canSup ? '' : 'disabled'}><i class="ic">⚡</i><b>Kuchli zarba: ${ROSTER[t]}</b><small>${canSup ? `−${SUP}` : `${st.en[me]}/3`}</small></button>`).join('')}
-        </div>`;
-    }
-
-    const anyOff = !local && players.some(i => !online[i]) && !st.over;
+  function renderResults() {
+    const rows = players.map(i => {
+      const r = results[i] && results[i].g === gid ? results[i].t : null;
+      const o = others[i] && others[i].g === gid ? others[i].d : 0;
+      return { i, r, o };
+    }).sort((a, b) => (a.r ?? 1e9) - (b.r ?? 1e9) || b.o - a.o);
+    const allDone = players.every(i => (results[i] && results[i].g === gid) || !online[i]) || Date.now() - gid > FRESH;
+    const w = rows[0] && rows[0].r != null && allDone ? rows[0].i : -1;
+    const n = onlineCount();
     setApp(`
       <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="fighters" style="grid-template-columns:repeat(${shown.length},minmax(0,1fr))">${fighters}</div>
-        ${anyOff ? `<div class="notice">${players.filter(i => !online[i]).map(i => `<b>${ROSTER[i]}</b>`).join(', ')} oflayn. Qaytib kirishini kuting.</div>` : ''}
-        ${noRoom && !local ? offlineNote() : ''}
-        ${!st.over ? `<div class="lbl">${st.round + 1}-raund</div>` : ''}
-        ${pad}
-        ${last ? `<div class="lbl">${st.round}-raund natijasi</div><ul class="log">${last.log.map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
-      </div>`);
+        ${w >= 0 ? `<div class="card win" style="--c:${COLORS[w]}"><div class="trophy">🏆</div><div class="crown">${ROSTER[w]} yutdi!</div></div>`
+                 : `<span class="lbl">Poyga ketyapti</span>`}
+        <div class="res">${rows.map((x, k) => `
+          <div class="card row">
+            <span class="place">${x.r != null ? k + 1 : '–'}</span>
+            ${badge(x.i)}
+            <div class="meta"><span class="nm">${ROSTER[x.i]}${x.i === me ? ' (siz)' : ''}</span>
+              ${x.r == null ? `<span class="sub">${online[x.i] ? `Yo'lda: ${Math.round(x.o / 10) * 10} m` : 'Chiqib ketdi'}</span>` : ''}</div>
+            <span class="t">${x.r != null ? x.r.toFixed(1) + ' s' : ''}</span>
+          </div>`).join('')}
+        </div>
+        <button class="btn big" data-start ${allDone && n >= 2 && connected ? '' : 'disabled'}>Yangi poyga</button>
+      </div>`, 'results');
   }
 
-  function describe(code) {
-    const a = code[0], t = +code.slice(1);
-    return a === 'a' ? `${ROSTER[t]}ga zarba` : a === 's' ? `${ROSTER[t]}ga kuchli zarba` : a === 'd' ? 'Qalqon' : 'Davolanish';
+  // ---------- input ----------
+  function wireRace() {
+    const set = (side, on, el) => { keys[side] = on; if (el) el.classList.toggle('down', on); };
+    document.querySelectorAll('[data-steer]').forEach(b => {
+      const s = b.dataset.steer;
+      b.addEventListener('pointerdown', e => { e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (_) {} set(s, true, b); });
+      for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, () => set(s, false, b));
+      b.addEventListener('contextmenu', e => e.preventDefault());
+    });
+    const cv = document.getElementById('cv');
+    const held = new Map();
+    cv.addEventListener('pointerdown', e => { e.preventDefault(); const s = e.offsetX < cv.clientWidth / 2 ? 'l' : 'r'; held.set(e.pointerId, s); keys[s] = true; });
+    const up = e => { const s = held.get(e.pointerId); if (s) { held.delete(e.pointerId); if (![...held.values()].includes(s)) keys[s] = false; } };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
   }
-  function offlineNote() {
-    return `<div class="notice" style="display:flex;flex-direction:column;gap:10px"><span><b>Onlayn ulanib bo'lmadi.</b> Bu telefon boshqalarni ko'ra olmayapti.</span>
-      <button class="btn" data-local>Bitta telefonda o'ynash</button></div>`;
-  }
-  function rulesHtml() {
-    return `<div class="rules"><span class="lbl">Qoidalar</span>
-      <span>Har raundda uchalangiz <b>bir vaqtda, yashirin</b> harakat tanlaysiz. Hamma tanlagach, natija chiqadi.</span>
-      <span><b>Zarba</b> −${ATK} jon. <b>Qalqon</b> oddiy zarbani to'xtatadi, uruvchi esa −1 oladi. <b>Davolanish</b> +${HEAL}.</span>
-      <span>Har raundda 1 kuch yig'iladi. 3 kuch bo'lsa <b>kuchli zarba</b> (−${SUP}) qalqonni ham yorib o'tadi.</span>
-      <span>Ikki kishi bitta odamga birga ursa, har zarbaga +${TEAM}. Oxirgi tirik qolgan yutadi!</span></div>`;
-  }
+  addEventListener('keydown', e => { if (e.key === 'ArrowLeft') keys.l = true; if (e.key === 'ArrowRight') keys.r = true; });
+  addEventListener('keyup', e => { if (e.key === 'ArrowLeft') keys.l = false; if (e.key === 'ArrowRight') keys.r = false; });
 
   $app.addEventListener('click', e => {
     const b = e.target.closest('button');
     if (!b || b.disabled) return;
-    if (b.dataset.pick) pick(+b.dataset.pick);
-    else if ('start' in b.dataset) startBattle();
-    else if ('leave' in b.dataset) leave();
-    else if (b.dataset.act) choose(b.dataset.act);
-    else if ('ready' in b.dataset) { handoff = false; render(); }
-    else if ('local' in b.dataset) { local = true; if (client) client.end(true); setNet(); startBattle(); }
-    else if ('copy' in b.dataset) {
-      const done = () => { b.textContent = 'Nusxa olindi ✓'; };
-      try { navigator.clipboard.writeText(shareUrl).then(done, () => document.getElementById('share').select()); }
-      catch (e) { document.getElementById('share').select(); }
-    }
+    if (b.dataset.pick) { const i = +b.dataset.pick; if (online[i]) return; me = i; save(); connect(); render(); }
+    else if ('start' in b.dataset) newRace();
   });
 
+  setInterval(() => { if (!race || race.fin) render(); }, 5000);   // lets "live" screens expire on their own
   setNet(); render(); connect();
 })();
 </script>
-
 </body>
 </html>
