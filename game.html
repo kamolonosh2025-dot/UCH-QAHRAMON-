@@ -50,6 +50,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
 .garage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .pick{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 10px;color:var(--ink);font-family:var(--body)}
 .pick canvas{width:80px;height:120px;max-width:100%}
+.pick img{width:100%;height:120px;object-fit:contain;border-radius:8px;background:#eee}
 .pick b{font:400 22px var(--display);letter-spacing:.03em}
 .pick.sel{background:var(--zap);transform:rotate(-1.5deg)}
 .mdl{font-weight:700;color:var(--muted);font-size:14px}
@@ -87,6 +88,8 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
   const ROSTER = ['Shahzod', 'Sardor', 'Ahmat'];
   const COLORS = ['#ff3b3b', '#2f6bff', '#ff9f00'];
   const MODELS = ['Lacetti', 'Cobalt', 'Malibu'];
+  const PAINT = ['#d9d4c9', '#f4f5f6', '#e6e9ee'];      // champagne Lacetti, white Cobalt, pearl-white Malibu
+  const PHOTO = ['cars/lacetti.jpg', 'cars/cobalt.jpg', 'cars/malibu.jpg'];       // real photos for the garage, when we have them
   const LANES = [.125, .375, .625, .875];
   const TRACK = 2000, VMAX = 55, ACC = 16, FRESH = 150000;   // metres, m/s, m/s², ms a race stays "live"
   const $app = document.getElementById('app'), $net = document.getElementById('net');
@@ -407,12 +410,15 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
       if (i === me) continue;
       const o = others[i]; if (!o || o.g !== R.gid) continue;
       const y = sy(o.d); if (y < -60 || y > H + 60) continue;
-      car(c, sx(o.x), y, cw, COLORS[i], .6, carOf[i]);
-      c.fillStyle = '#111'; c.fillText(ROSTER[i], sx(o.x), y - cw * 1.15);
+      car(c, sx(o.x), y, cw, PAINT[carOf[i]], .8, carOf[i]);
+      const lw = c.measureText(ROSTER[i]).width + 12;
+      rr(c, sx(o.x) - lw / 2, y - cw * 1.2 - 18, lw, 18, 9); c.fillStyle = COLORS[i]; c.fill(); c.lineWidth = 2; c.strokeStyle = '#111'; c.stroke();
+      c.fillStyle = '#fff'; c.fillText(ROSTER[i], sx(o.x), y - cw * 1.2 - 2);
     }
     // my car
     if (now < R.boostUntil) { c.fillStyle = 'rgba(255,212,0,.6)'; c.beginPath(); c.moveTo(sx(R.x) - cw * .35, carY + cw * .85); c.lineTo(sx(R.x), carY + cw * (1.6 + Math.random() * .6)); c.lineTo(sx(R.x) + cw * .35, carY + cw * .85); c.fill(); }
-    car(c, sx(R.x), carY, cw, COLORS[me], 1, carOf[me]);
+    c.beginPath(); c.ellipse(sx(R.x), carY, cw * .85, cw * 1.35, 0, 0, Math.PI * 2); c.lineWidth = 3; c.strokeStyle = COLORS[me]; c.globalAlpha = .7; c.stroke(); c.globalAlpha = 1;
+    car(c, sx(R.x), carY, cw, PAINT[carOf[me]], 1, carOf[me]);
     // progress strip
     const px = 14, pw = W - 28, py = 14;
     rr(c, px, py, pw, 12, 6); c.fillStyle = '#fff'; c.fill(); c.lineWidth = 2.5; c.strokeStyle = '#111'; c.stroke();
@@ -484,7 +490,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
         </div>
         <span class="lbl">Mashinangiz</span>
         <div class="garage">${MODELS.map((m, k) => `
-          <button class="card pick${carOf[me] === k ? ' sel' : ''}" data-model="${k}"><canvas data-prev="${k}" width="80" height="120"></canvas><b>${m}</b></button>`).join('')}
+          <button class="card pick${carOf[me] === k ? ' sel' : ''}" data-model="${k}">${PHOTO[k] ? `<img src="${PHOTO[k]}" alt="${m}">` : `<canvas data-prev="${k}" width="80" height="120"></canvas>`}<b>${m}</b></button>`).join('')}
         </div>
         <button class="btn big" data-start ${ok ? '' : 'disabled'}>Poygani boshlash</button>
       </div>`, 'lobby');
@@ -492,7 +498,7 @@ button:focus-visible{outline:3px solid var(--zap);outline-offset:2px}
       const c = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1);
       if (cv.width !== 80 * dpr) { cv.width = 80 * dpr; cv.height = 120 * dpr; }
       c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, 80, 120);
-      car(c, 40, 60, 46, COLORS[me], 1, +cv.dataset.prev);
+      car(c, 40, 60, 42, PAINT[+cv.dataset.prev], 1, +cv.dataset.prev);
     });
   }
 
