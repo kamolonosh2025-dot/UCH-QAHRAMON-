@@ -214,6 +214,8 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
   let online = [false, false, false];
   let clash = false;
   let lastRound = 0, noRoom = false;
+  let players = [0, 1, 2];  // who is in the current battle
+  const onlineCount = () => online.filter(Boolean).length;
   let local = false, localMoves = [[], [], []], handoff = true;  // one phone passed around
 
   try {
@@ -240,7 +242,10 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
     const i = +n;
     if (kind === 'on' && i >= 0 && i < 3) online[i] = msg === '1';
     else if (kind === 'g') {
-      const g = +msg || 0;
+      const [gs, ps] = msg.split('|');
+      const g = +gs || 0;
+      const pl = ps ? [...new Set([...ps].map(Number))].filter(k => k >= 0 && k < 3) : [0, 1, 2];
+      players = pl.length >= 2 ? pl : [0, 1, 2];
       if (g !== gid) { gid = g; myMoves = []; theirs = [null, null, null]; lastRound = 0; save(); pushMoves(); }
     } else if (kind === 'm' && i >= 0 && i < 3) {
       try {
@@ -285,7 +290,8 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
     return k && k.g === gid ? k.m : [];
   }
   function simulate() {
-    const hp = [MAX_HP, MAX_HP, MAX_HP], en = [0, 0, 0], lastDef = [false, false, false];
+    const inGame = local ? [0, 1, 2] : players;
+    const hp = [0, 1, 2].map(i => inGame.includes(i) ? MAX_HP : 0), en = [0, 0, 0], lastDef = [false, false, false];
     const all = [0, 1, 2].map(movesOf);
     const rounds = [];
     let r = 0, over = false, winner = -1;
@@ -342,7 +348,9 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
   function startBattle() {
     if (local) { localMoves = [[], [], []]; handoff = true; lastRound = 0; return render(); }
     gid = Date.now(); myMoves = []; theirs = [null, null, null]; lastRound = 0;
-    pub('g', String(gid)); pushMoves(); save(); render();
+    players = [0, 1, 2].filter(i => online[i]);
+    if (players.length < 2) return;
+    pub('g', gid + '|' + players.join('')); pushMoves(); save(); render();
   }
   function choose(code) {
     const st = simulate();
@@ -390,11 +398,11 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
   }
 
   function renderLobby() {
-    const all = online.every(Boolean);
+    const n = onlineCount(), all = n >= 2;
     setApp(`
       <div style="display:flex;flex-direction:column;gap:14px">
         <h2>Salom, <span style="color:${COLORS[me]}">${ROSTER[me]}</span>!</h2>
-        <p class="sub">${all ? 'Hamma joyida. Jangni boshlash mumkin.' : 'Uchala qahramon onlayn bo\'lishini kuting.'}</p>
+        <p class="sub">${all ? `${n} kishi onlayn. Jangni boshlash mumkin!` : 'Kamida yana bitta qahramon onlayn bo\'lishini kuting.'}</p>
         ${clash ? `<div class="notice"><b>Diqqat:</b> ${ROSTER[me]} ismi boshqa telefonda ham tanlangan. Bittangiz boshqa ism tanlang.</div>` : ''}
         ${noRoom ? offlineNote() : ''}
         <div class="roster">${ROSTER.map((n, i) => `
@@ -413,7 +421,9 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
     const mine = me >= 0 ? movesOf(me).length : 0;
     const newRound = st.round > lastRound;
     const last = st.rounds[st.round - 1];
-    const fighters = ROSTER.map((n, i) => {
+    const shown = local ? [0, 1, 2] : players;
+    const fighters = shown.map(i => {
+      const n = ROSTER[i];
       const pct = st.hp[i] / MAX_HP * 100;
       const chosen = movesOf(i).length > st.round;
       const alive = st.hp[i] > 0;
@@ -439,12 +449,14 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
           <div class="lbl">${st.round}-raundda tugadi</div>
           <div class="trophy">${w >= 0 ? HERO[w] : '🤝'}</div><div class="crown">${w >= 0 ? `${ROSTER[w]} g'olib!` : 'Durang!'}</div>
           <p class="sub">${w === me ? 'Zo\'r jang qildingiz!' : w >= 0 ? 'Keyingi safar sizning navbatingiz.' : 'Hamma bir vaqtda yiqildi.'}</p>
-          <button class="btn big" data-start ${local || online.every(Boolean) ? '' : 'disabled'}>Yangi jang</button>
-          ${local || online.every(Boolean) ? '' : '<p class="sub" style="font-size:13px">Yangi jang uchun uchalangiz onlayn bo\'lishingiz kerak.</p>'}
+          <button class="btn big" data-start ${local || onlineCount() >= 2 ? '' : 'disabled'}>Yangi jang</button>
+          ${local || onlineCount() >= 2 ? '' : '<p class="sub" style="font-size:13px">Yangi jang uchun kamida 2 kishi onlayn bo\'lishi kerak.</p>'}
         </div>`;
     } else if (local && handoff) {
       pad = `<div class="wait" style="--c:${COLORS[me]}">Telefonni <b style="color:var(--c)">${ROSTER[me]}</b>ga bering.<br><br>
         <button class="btn big" style="background:var(--c)" data-ready>Men ${ROSTER[me]}, tayyorman</button></div>`;
+    } else if (!local && !players.includes(me)) {
+      pad = `<div class="wait"><b>Bu jangda siz yo'qsiz.</b><br>Jang tugashini kuting, keyingisida qatnashasiz.</div>`;
     } else if (st.hp[me] <= 0) {
       pad = `<div class="wait"><b>Siz yiqildingiz.</b><br>Qolgan ikkisining jangini tomosha qiling.</div>`;
     } else if (mine > st.round) {
@@ -461,11 +473,11 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
         </div>`;
     }
 
-    const anyOff = !local && !online.every(Boolean) && !st.over;
+    const anyOff = !local && players.some(i => !online[i]) && !st.over;
     setApp(`
       <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="fighters">${fighters}</div>
-        ${anyOff ? `<div class="notice">${[0, 1, 2].filter(i => !online[i]).map(i => `<b>${ROSTER[i]}</b>`).join(', ')} oflayn. Qaytib kirishini kuting.</div>` : ''}
+        <div class="fighters" style="grid-template-columns:repeat(${shown.length},minmax(0,1fr))">${fighters}</div>
+        ${anyOff ? `<div class="notice">${players.filter(i => !online[i]).map(i => `<b>${ROSTER[i]}</b>`).join(', ')} oflayn. Qaytib kirishini kuting.</div>` : ''}
         ${noRoom && !local ? offlineNote() : ''}
         ${!st.over ? `<div class="lbl">${st.round + 1}-raund</div>` : ''}
         ${pad}
