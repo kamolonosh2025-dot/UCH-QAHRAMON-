@@ -161,13 +161,9 @@ h1 .sw{display:inline-flex;width:38px;height:38px;border-radius:11px;background:
   const BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt'];
   const params = new URLSearchParams(location.search);
   let code = (params.get('xona') || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12);
-  if (!code) {
-    code = Math.random().toString(36).slice(2, 8);
-    params.set('xona', code);
-    try { history.replaceState(null, '', location.pathname + '?' + params); } catch (e) {}
-  }
+  if (!code) code = 'asosiy';  // one fixed room, so the plain link always works
   const T = 'uchqahramon/v1/' + code, KEY = 'uq:' + code;
-  const shareUrl = location.origin + location.pathname + '?xona=' + code;
+  const shareUrl = location.origin + location.pathname + (code === 'asosiy' ? '' : '?xona=' + code);
 
   let client = null, connected = false, brokerIdx = 0, everConnected = false;
   let me = -1, gid = 0, myMoves = [];
