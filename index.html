@@ -361,12 +361,6 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
   const status = i => local ? '' : online[i]
     ? `<span class="pill on"><span class="dot on"></span>Onlayn</span>`
     : `<span class="pill"><span class="dot"></span>Oflayn</span>`;
-  function hereNote() {
-    return `<div class="here" style="flex-direction:column;align-items:stretch;gap:8px">
-      <span>Do'stlaringizga shu havolani yuboring:</span>
-      <input id="share" readonly value="${esc(shareUrl)}" onclick="this.select()">
-      <button class="btn" data-copy>Havoladan nusxa olish</button></div>`;
-  }
 
   function render() {
     if (local) {
@@ -384,7 +378,7 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
     setApp(`
       <div style="display:flex;flex-direction:column;gap:14px">
         <h2>Siz kimsiz?</h2>
-        ${noRoom ? offlineNote() : hereNote()}
+        ${noRoom ? offlineNote() : ''}
         <div class="roster">${ROSTER.map((n, i) => `
           <div class="who" style="--c:${COLORS[i]}">
             <div class="badge">${HERO[i]}</div>
@@ -402,7 +396,7 @@ h2{font-size:30px;letter-spacing:.03em;font-weight:400}
         <h2>Salom, <span style="color:${COLORS[me]}">${ROSTER[me]}</span>!</h2>
         <p class="sub">${all ? 'Hamma joyida. Jangni boshlash mumkin.' : 'Uchala qahramon onlayn bo\'lishini kuting.'}</p>
         ${clash ? `<div class="notice"><b>Diqqat:</b> ${ROSTER[me]} ismi boshqa telefonda ham tanlangan. Bittangiz boshqa ism tanlang.</div>` : ''}
-        ${noRoom ? offlineNote() : hereNote()}
+        ${noRoom ? offlineNote() : ''}
         <div class="roster">${ROSTER.map((n, i) => `
           <div class="who${i === me ? ' mine' : ''}" style="--c:${COLORS[i]}">
             <div class="badge">${HERO[i]}</div>
