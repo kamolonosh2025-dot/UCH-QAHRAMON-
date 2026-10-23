@@ -136,7 +136,8 @@ body.racing .wrap{padding:0;max-width:none}
   let queued = false;
   const later = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; render(); }); } };
 
-  function onMsg(topic, msg) {
+  let liveStart = 0;   // performance.now() when a fresh start signal arrived, so every phone counts down together
+  function onMsg(topic, msg, retained) {
     const [kind, n] = topic.slice(T.length + 1).split('/');
     const i = +n;
     if (kind === 'on' && i >= 0 && i < 3) online[i] = msg === '1';
@@ -145,7 +146,7 @@ body.racing .wrap{padding:0;max-width:none}
       const [gs, ps] = msg.split('|');
       const g = +gs || 0;
       const pl = ps ? [...new Set([...ps].map(Number))].filter(k => k >= 0 && k < 3) : [];
-      if (g !== gid) { gid = g; players = pl.length >= 2 ? pl : [0, 1, 2]; others = [null, null, null]; decide(); }
+      if (g !== gid) { liveStart = retained ? 0 : performance.now(); gid = g; players = pl.length >= 2 ? pl : [0, 1, 2]; others = [null, null, null]; decide(); }
     } else if (kind === 'f' && i >= 0 && i < 3) {
       try { const d = JSON.parse(msg); if (typeof d.g === 'number' && typeof d.t === 'number') results[i] = d; } catch (e) {}
     } else if (kind === 'pos' && i >= 0 && i < 3 && i !== me) {
@@ -172,7 +173,7 @@ body.racing .wrap{padding:0;max-width:none}
       render();
     });
     c.on('close', () => { if (c === client && connected) { connected = false; setNet(); render(); } });
-    c.on('message', (t, buf) => { if (c === client) onMsg(t, buf.toString()); });
+    c.on('message', (t, buf, pkt) => { if (c === client) onMsg(t, buf.toString(), pkt && pkt.retain); });
     setTimeout(() => {
       if (ok || c !== client) return;
       noRoom = true; brokerIdx = (brokerIdx + 1) % BROKERS.length; render(); connect();
@@ -208,6 +209,7 @@ body.racing .wrap{padding:0;max-width:none}
   }
 
   function newRace() {
+    liveStart = performance.now();
     const pl = [0, 1, 2].filter(i => online[i]);
     if (pl.length < 2 || me < 0) return;
     gid = Date.now(); players = pl; others = [null, null, null];
@@ -216,8 +218,10 @@ body.racing .wrap{padding:0;max-width:none}
   }
 
   function startRace() {
-    race = { gid, obs: buildTrack(gid), d: 0, x: .5, v: 0, steer: 0, boostUntil: 0, crashUntil: 0,
-             start: performance.now() + Math.max(0, gid + 3500 - Date.now()), fin: false, time: 0, lastPub: 0, last: performance.now() };
+    const n = players.length, slot = Math.max(0, players.indexOf(me));
+    const grid = n === 2 ? [.375, .625] : [.2, .5, .8];
+    race = { gid, obs: buildTrack(gid), d: 0, x: grid[slot] ?? .5, v: 0, steer: 0, boostUntil: 0, crashUntil: 0,
+             start: liveStart ? liveStart + 3500 : performance.now() + Math.max(0, Math.min(3500, gid + 3500 - Date.now())), fin: false, time: 0, lastPub: 0, last: performance.now() };
     keys.l = keys.r = false;
     try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
     requestAnimationFrame(tick);
@@ -387,6 +391,12 @@ body.racing .wrap{padding:0;max-width:none}
     for (let k = Math.floor((R.d - 12) / 8); k < (R.d + 46) / 8; k++) {
       const y = sy(k * 8 + 4);
       for (const lx of [.25, .5, .75]) c.fillRect(roadL + lx * roadW - 2.5, y, 5, 4 * ppm);
+    }
+    // start line
+    const st = sy(2.2);
+    if (st > -40 && st < H + 40) {
+      c.fillStyle = '#fff'; c.fillRect(roadL, st, roadW, 6);
+      c.font = '400 22px Bangers, Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'top'; c.fillText('START', roadL + roadW / 2, st + 10);
     }
     // finish line
     const fy = sy(TRACK);
