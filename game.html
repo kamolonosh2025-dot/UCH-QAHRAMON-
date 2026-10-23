@@ -483,8 +483,12 @@ body.racing .wrap{padding:0;max-width:none}
           <div class="card who">
             ${badge(i)}
             <div class="meta"><span class="nm">${n}</span>${status(i)}</div>
-            <button class="btn" data-pick="${i}" ${online[i] ? 'disabled' : ''}>${online[i] ? 'Band' : 'Bu menman'}</button>
+            <button class="btn" data-pick="${i}">Bu menman</button>
           </div>`).join('')}
+        </div>
+        <p class="sub">Ismingizni tanlang, keyin mashinangizni tanlaysiz:</p>
+        <div class="garage">${MODELS.map((m, k) => `
+          <div class="card pick"><img src="${PHOTO[k]}" alt="${m}"><b>${m}</b></div>`).join('')}
         </div>
       </div>`, 'pick');
   }
@@ -587,7 +591,7 @@ body.racing .wrap{padding:0;max-width:none}
   $app.addEventListener('click', e => {
     const b = e.target.closest('button');
     if (!b || b.disabled) return;
-    if (b.dataset.pick) { const i = +b.dataset.pick; if (online[i]) return; me = i; save(); connect(); render(); }
+    if (b.dataset.pick) { const i = +b.dataset.pick; me = i; save(); connect(); render(); }
     else if ('start' in b.dataset) newRace();
     else if ('back' in b.dataset) { dismissed = gid; render(); }
     else if (b.dataset.model) { carOf[me] = +b.dataset.model; save(); pub(`car/${me}`, b.dataset.model); render(); }
